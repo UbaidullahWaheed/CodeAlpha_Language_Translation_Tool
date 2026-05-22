@@ -1,0 +1,53 @@
+name: Production Release & SLSA Provenance
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers automatically when you push a version tag like v2.1.1
+
+permissions:
+  contents: read
+
+jobs:
+  # 1. Build and package your python code artifacts
+  build:
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Build Source Distribution Tarball
+        run: |
+          pip install wheel
+          python setup.py sdist bdist_wheel
+
+      - name: Generate Cryptographic SHA256 Artifact Hashes
+        id: hash
+        run: |
+          cd dist
+          echo "hashes=$(sha256sum * | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Build Artifacts for Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-artifacts
+          path: dist/
+
+  # 2. Automatically generate the secure SLSA3 Provenance manifest
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read   # Needed to intercept the workflow identity
+      id-token: write  # Needed to cryptographically sign the OIDC provenance
+      contents: write # Needed to attach the provenance file to your release
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      upload-assets: true # Attaches the generated provenance straight back to your GitHub Release matrix
