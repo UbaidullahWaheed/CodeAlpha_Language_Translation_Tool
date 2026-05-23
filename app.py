@@ -7,13 +7,48 @@ import time
 import re
 from concurrent.futures import ThreadPoolExecutor
 
-# ---------------- PRE-CONFIGURATION & THEME ENGINE ---------------- #
+# ---------------- PRE-CONFIGURATION & NATIVE THEME ENGINE ---------------- #
 st.set_page_config(
     page_title="NexusAI Universal Translation Matrix",
     page_icon="🪐",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Fetch current device theme properties dynamically (Supports mobile & desktop natively)
+active_system_theme = st.theme()
+
+# Detect and build automatic fallback arrays depending on what choice is selected on the phone
+if active_system_theme and active_system_theme.background_color == "#ffffff":
+    # --- ACTIVE THEME: SOLAR FLARE / LIGHT MODE ---
+    bg_color = "#f8fafc"
+    card_color = "#ffffff"
+    text_color = "#0f172a"
+    input_bg = "#ffffff"
+    input_text = "#0f172a"
+    border_color = "#2563eb"
+    accent_color = "#2563eb"
+    sidebar_bg = "#f1f5f9"
+    sidebar_text = "#0f172a"
+    popover_bg = "#ffffff"
+    download_btn = "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
+    header_icon_color = "#0f172a"
+    build_signature = "Build 2.4.0 | Native Sync Light"
+else:
+    # --- ACTIVE THEME: DEEP SPACE / DARK MODE (DEFAULT) ---
+    bg_color = "#0b0e14"
+    card_color = "#161b22"
+    text_color = "#ffffff"
+    input_bg = "#10141a"
+    input_text = "#58a6ff"
+    border_color = "#30363d"
+    accent_color = "#4f46e5"
+    sidebar_bg = "#0d1117"
+    sidebar_text = "#f0f6fc"
+    popover_bg = "#161b22"
+    download_btn = "linear-gradient(135deg, #238636 0%, #2ea043 100%)"
+    header_icon_color = "#ffffff"
+    build_signature = "Build 2.4.0 | Native Sync Dark"
 
 # Initialize Session State Variables Safely
 if "translated_text" not in st.session_state:
@@ -44,13 +79,6 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
-    # We maintain the key so Streamlit completely forces a rerun across mobile shadows
-    app_theme = st.selectbox(
-        "Application Custom UI Skin",
-        ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"],
-        key="mobile_theme_key"
-    )
-    
     user_native_lang = st.selectbox(
         "Your Native Tongue (For Meaning Context)",
         options=language_catalog,
@@ -65,102 +93,75 @@ with st.sidebar:
     )
     st.caption(f"Routing processing through **{ai_engine}** pipelines.")
 
-# ---------------- HIGH-CONTRAST VISIBILITY ARCHITECTURE ---------------- #
-theme_styles = {
-    "🌌 Deep Space (Dark)": {
-        "bg": "#0b0e14", "card": "#161b22", "text": "#ffffff", 
-        "input_bg": "#10141a", "input_text": "#58a6ff", "border": "#30363d",
-        "accent": "#4f46e5", "sidebar_bg": "#0d1117", "sidebar_text": "#f0f6fc",
-        "popover_bg": "#161b22", "download_btn": "linear-gradient(135deg, #238636 0%, #2ea043 100%)",
-        "header_icon": "#ffffff", "meta_scheme": "dark"
-    },
-    "☀️ Solar Flare (Light)": {
-        "bg": "#f8fafc", "card": "#ffffff", "text": "#0f172a",          
-        "input_bg": "#ffffff", "input_text": "#0f172a", "border": "#2563eb",        
-        "accent": "#2563eb", "sidebar_bg": "#f1f5f9", "sidebar_text": "#0f172a",
-        "popover_bg": "#ffffff", "download_btn": "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-        "header_icon": "#0f172a", "meta_scheme": "light"
-    },
-    "🪵 Amber Minimalist (Warm Theme)": {
-        "bg": "#f4f1ea", "card": "#fffcf0", "text": "#433422", 
-        "input_bg": "#ffffff", "input_text": "#433422", "border": "#c2410c",        
-        "accent": "#c2410c", "sidebar_bg": "#efebe3", "sidebar_text": "#433422",
-        "popover_bg": "#fffcf0", "download_btn": "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)",
-        "header_icon": "#433422", "meta_scheme": "light"
-    }
-}
-sel_theme = theme_styles[app_theme]
-
-# FIXED MOBILE DOM OVERRIDE: Using st.html explicitly targets the top-level window layout on mobile devices
+# --- NATIVE INJECTOR SEAMLESS STYLING SHEET ---
 st.html(f"""
 <style>
-    /* Absolute target paths to break through mobile viewport shadow wrappers */
+    /* Global layout hooks ensuring mobile shadows mirror your choice instantly */
     html, body, [data-testid="stAppViewContainer"], .stApp {{
-        background-color: {sel_theme['bg']} !important;
+        background-color: {bg_color} !important;
     }}
     
-    /* Make sure all mobile text follows the chosen color scheme */
     h1, h2, h3, h4, h5, h6, p, label, span, small, li, [data-testid="stMarkdownContainer"] p {{ 
-        color: {sel_theme['text']} !important; 
+        color: {text_color} !important; 
     }}
 
-    /* FIXED MOBILE BAR VIEWPORTS (DEPLOY & THREE DOTS ICON POSITIONING) */
+    /* FIXED MOBILE CORE TOP BAR ELEMENT VISIBILITY ACCESSIBILITY */
     header[data-testid="stHeader"], [data-testid="stHeader"]::before {{
-        background-color: {sel_theme['bg']} !important;
-        background: {sel_theme['bg']} !important;
+        background-color: {bg_color} !important;
+        background: {bg_color} !important;
     }}
     header[data-testid="stHeader"] svg, header[data-testid="stHeader"] button, header[data-testid="stHeader"] div {{
-        fill: {sel_theme['header_icon']} !important;
-        color: {sel_theme['header_icon']} !important;
+        fill: {header_icon_color} !important;
+        color: {header_icon_color} !important;
     }}
 
     [data-testid="stSidebar"] {{
-        background-color: {sel_theme['sidebar_bg']} !important;
-        border-right: 1px solid {sel_theme['border']};
+        background-color: {sidebar_bg} !important;
+        border-right: 1px solid {border_color};
     }}
-    [data-testid="stSidebar"] * {{ color: {sel_theme['sidebar_text']} !important; }}
+    [data-testid="stSidebar"] * {{ color: {sidebar_text} !important; }}
 
-    /* UNIVERSAL CONTRAST FORM LAYOUT CONTROLS */
+    /* INTERACTIVE SELECTION FIELDS CONTRAST FIXES */
     div[data-baseweb="select"], .stSelectbox div[role="button"], div[data-baseweb="select"] > div,
     .stTextArea textarea, .stTextInput input {{
-        background-color: {sel_theme['input_bg']} !important;
-        color: {sel_theme['input_text']} !important;
-        border: 2px solid {sel_theme['border']} !important;
+        background-color: {input_bg} !important;
+        color: {input_text} !important;
+        border: 2px solid {border_color} !important;
         border-radius: 8px !important;
     }}
     
     div[data-baseweb="select"] span, div[data-baseweb="select"] div, div[data-baseweb="select"] p,
     .stSelectbox text, .stSelectbox p, .stSelectbox span {{
-        color: {sel_theme['input_text']} !important;
-        -webkit-text-fill-color: {sel_theme['input_text']} !important;
+        color: {input_text} !important;
+        -webkit-text-fill-color: {input_text} !important;
     }}
 
-    /* FLOATING OVERLAY MENUS FOR ANDROID DROPDOWNS */
+    /* FLOATING DROPDOWN ELEMENTS ON MOBILE VIEWPORTS */
     div[data-baseweb="popover"] ul, div[data-baseweb="menu"] li, div[data-baseweb="popover"] [role="option"] {{
-        background-color: {sel_theme['popover_bg']} !important;
-        color: {sel_theme['input_text']} !important;
+        background-color: {popover_bg} !important;
+        color: {input_text} !important;
     }}
 
     div[data-baseweb="select"] svg, .stSelectbox svg, [data-testid="stSidebar"] svg {{
-        fill: {sel_theme['input_text']} !important;
-        color: {sel_theme['input_text']} !important;
+        fill: {input_text} !important;
+        color: {input_text} !important;
     }}
 
     .stTextArea textarea, .stTextInput input {{
         cursor: text !important;
-        caret-color: {sel_theme['input_text']} !important;
+        caret-color: {input_text} !important;
     }}
 
     .stTabs [data-baseweb="tab-list"] {{
-        gap: 8px; background-color: {sel_theme['card']} !important;
-        padding: 6px 12px; border-radius: 8px; border: 1px solid {sel_theme['border']};
+        gap: 8px; background-color: {card_color} !important;
+        padding: 6px 12px; border-radius: 8px; border: 1px solid {border_color};
     }}
     .stTabs [data-baseweb="tab"] {{
         height: 40px; white-space: pre; background-color: transparent !important;
-        border-radius: 6px; color: {sel_theme['text']} !important; font-weight: 600;
+        border-radius: 6px; color: {text_color} !important; font-weight: 600;
     }}
-    .stTabs [aria-selected="true"] {{ background-color: {sel_theme['accent']} !important; color: white !important; }}
-    .app-workspace-panel {{ background-color: {sel_theme['card']} !important; border: 1px solid {sel_theme['border']}; border-radius: 12px; padding: 24px; margin-bottom: 20px; }}
+    .stTabs [aria-selected="true"] {{ background-color: {accent_color} !important; color: white !important; }}
+    .app-workspace-panel {{ background-color: {card_color} !important; border: 1px solid {border_color}; border-radius: 12px; padding: 24px; margin-bottom: 20px; }}
     
     div[data-baseweb="select"], div[data-baseweb="select"] *, .stSelectbox div[role="button"],
     button, .stButton button, .stDownloadButton button, .stTabs [data-baseweb="tab"], .stCheckbox label {{
@@ -168,19 +169,19 @@ st.html(f"""
     }}
 
     .stButton button {{
-        background: linear-gradient(135deg, {sel_theme['accent']} 0%, #db2777 100%) !important;
+        background: linear-gradient(135deg, {accent_color} 0%, #db2777 100%) !important;
         color: white !important; font-weight: 700 !important; border: none !important;
         border-radius: 8px !important; width: 100%; height: 50px; letter-spacing: 0.5px;
     }}
     .stDownloadButton button {{
-        background: {sel_theme['download_btn']} !important; color: white !important;
+        background: {download_btn} !important; color: white !important;
         border: none !important; border-radius: 8px !important; width: 100%; font-weight: 700 !important; height: 45px;
     }}
-    .main-title {{ font-size: 38px; font-weight: 900; text-align: center; background: linear-gradient(to right, {sel_theme['accent']}, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0px; }}
-    .history-item {{ background-color: {sel_theme['card']}; border-left: 5px solid {sel_theme['accent']}; padding: 12px; margin-bottom: 6px; border-radius: 6px; }}
+    .main-title {{ font-size: 38px; font-weight: 900; text-align: center; background: linear-gradient(to right, {accent_color}, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0px; }}
+    .history-item {{ background-color: {card_color}; border-left: 5px solid {accent_color}; padding: 12px; margin-bottom: 6px; border-radius: 6px; }}
     
     .mobile-instruction-banner {{
-        background: linear-gradient(to right, {sel_theme['accent']}, #db2777);
+        background: linear-gradient(to right, {accent_color}, #db2777);
         color: white !important;
         padding: 12px;
         border-radius: 8px;
@@ -196,12 +197,12 @@ st.html(f"""
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.3.1 | Native DOM Extraction System</p>", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>{build_signature}</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- MOBILE / ANDROID UX NOTICE HEADLINE ---------------- #
 st.markdown(
-    f'<div class="mobile-instruction-banner">📱 <b>Android/Mobile Users:</b> Open the left sidebar menu (top-left arrow <b>&gt;</b>) to change your <span>Native Tongue Settings</span> for perfect meaning context verification.</div>', 
+    f'<div class="mobile-instruction-banner">📱 <b>Dynamic Engine Active:</b> Tap the three dots menu at the top right corner and choose Light or Dark mode to change themes seamlessly!</div>', 
     unsafe_allow_html=True
 )
 
@@ -279,7 +280,7 @@ if st.session_state.translated_text:
     ])
     
     with tab_translation:
-        st.markdown(f"<div style='background-color:{sel_theme['card']}; border:1px solid {sel_theme['border']}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.translated_text}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='background-color:{card_color}; border:1px solid {border_color}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.translated_text}</div>", unsafe_allow_html=True)
         try:
             tts = gTTS(text=st.session_state.translated_text, lang=target_code)
             audio_fp = io.BytesIO()
@@ -290,10 +291,10 @@ if st.session_state.translated_text:
             pass
 
     with tab_meaning:
-        st.markdown(f"<div style='background-color:{sel_theme['card']}; border:1px solid {sel_theme['border']}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.meaning_context_text}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='background-color:{card_color}; border:1px solid {border_color}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.meaning_context_text}</div>", unsafe_allow_html=True)
 
     with tab_phonetics:
-        st.markdown(f"<div style='background-color:{sel_theme['card']}; border:1px solid {sel_theme['border']}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.pronunciation_text}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='background-color:{card_color}; border:1px solid {border_color}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.pronunciation_text}</div>", unsafe_allow_html=True)
 
     st.markdown("<div style='margin-top:15px;'></div>", unsafe_allow_html=True)
     report_data = f"Source Text:\n{source_text}\n\nTranslation ({st.session_state.last_target_lang}):\n{st.session_state.translated_text}\n\nContext Meaning:\n{st.session_state.meaning_context_text}"
