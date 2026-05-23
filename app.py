@@ -15,11 +15,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Fetch current device theme properties dynamically (Supports mobile & desktop natively)
-active_system_theme = st.theme()
+# SAFE THEME DETECTION FOR V1.57.0
+# Fallback structure using experimental headers/context safely to prevent AttributeError
+try:
+    active_system_theme = st.context.theme
+except AttributeError:
+    try:
+        active_system_theme = st.theme()
+    except AttributeError:
+        active_system_theme = None
 
-# Detect and build automatic fallback arrays depending on what choice is selected on the phone
-if active_system_theme and active_system_theme.background_color == "#ffffff":
+# Detect color property defaults from the underlying runtime context
+if active_system_theme and getattr(active_system_theme, "background_color", "") == "#ffffff":
     # --- ACTIVE THEME: SOLAR FLARE / LIGHT MODE ---
     bg_color = "#f8fafc"
     card_color = "#ffffff"
@@ -33,9 +40,9 @@ if active_system_theme and active_system_theme.background_color == "#ffffff":
     popover_bg = "#ffffff"
     download_btn = "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
     header_icon_color = "#0f172a"
-    build_signature = "Build 2.4.0 | Native Sync Light"
+    build_signature = "Build 2.4.1 | Native Sync Light"
 else:
-    # --- ACTIVE THEME: DEEP SPACE / DARK MODE (DEFAULT) ---
+    # --- ACTIVE THEME: DEEP SPACE / DARK MODE (DEFAULT FALLBACK) ---
     bg_color = "#0b0e14"
     card_color = "#161b22"
     text_color = "#ffffff"
@@ -48,7 +55,7 @@ else:
     popover_bg = "#161b22"
     download_btn = "linear-gradient(135deg, #238636 0%, #2ea043 100%)"
     header_icon_color = "#ffffff"
-    build_signature = "Build 2.4.0 | Native Sync Dark"
+    build_signature = "Build 2.4.1 | Native Sync Dark"
 
 # Initialize Session State Variables Safely
 if "translated_text" not in st.session_state:
