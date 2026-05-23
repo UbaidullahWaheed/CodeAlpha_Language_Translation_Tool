@@ -44,11 +44,11 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
-    # Adding a key to the theme selector forces Streamlit to handle mobile state reruns instantly
+    # Force instant re-evaluation using the system state key tracking model
     app_theme = st.selectbox(
         "Application Custom UI Skin",
         ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"],
-        key="mobile_theme_selector"
+        key="mobile_theme_key"
     )
     
     user_native_lang = st.selectbox(
@@ -72,35 +72,37 @@ theme_styles = {
         "input_bg": "#10141a", "input_text": "#58a6ff", "border": "#30363d",
         "accent": "#4f46e5", "sidebar_bg": "#0d1117", "sidebar_text": "#f0f6fc",
         "popover_bg": "#161b22", "download_btn": "linear-gradient(135deg, #238636 0%, #2ea043 100%)",
-        "header_icon": "#ffffff"  # High-contrast color for header icons
+        "header_icon": "#ffffff"
     },
     "☀️ Solar Flare (Light)": {
         "bg": "#f8fafc", "card": "#ffffff", "text": "#0f172a",          
         "input_bg": "#ffffff", "input_text": "#0f172a", "border": "#2563eb",        
         "accent": "#2563eb", "sidebar_bg": "#f1f5f9", "sidebar_text": "#0f172a",
         "popover_bg": "#ffffff", "download_btn": "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-        "header_icon": "#0f172a"  # Dark contrast for light themes so deploy & dots are clear
+        "header_icon": "#0f172a"
     },
     "🪵 Amber Minimalist (Warm Theme)": {
         "bg": "#f4f1ea", "card": "#fffcf0", "text": "#433422", 
         "input_bg": "#ffffff", "input_text": "#433422", "border": "#c2410c",        
         "accent": "#c2410c", "sidebar_bg": "#efebe3", "sidebar_text": "#433422",
         "popover_bg": "#fffcf0", "download_btn": "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)",
-        "header_icon": "#433422"  # Amber contrast for warm theme elements
+        "header_icon": "#433422"
     }
 }
 sel_theme = theme_styles[app_theme]
 
 st.markdown(f"""
 <style>
-    /* FIX: FORCED RERENDER INJECTOR FOR MOBILE SYSTEM VIEWPORTS */
-    .stApp {{ background-color: {sel_theme['bg']} !important; }}
+    /* MOBILE ENGINE FIX: Force override parent layout background wrappers on touch viewports */
+    .stApp, div[data-testid="stAppViewContainer"], div[data-testid="stAppViewBlockContainer"] {{ 
+        background-color: {sel_theme['bg']} !important; 
+    }}
+    
     h1, h2, h3, h4, h5, h6, p, label, span, small {{ color: {sel_theme['text']} !important; }}
 
-    /* FIX: TOP EXTRUDED BANNER ACCESSIBILITY (DEPLOY, RUNNING ICON, & THREE DOTS MENU) */
+    /* TOP EXTRUDED BANNER ACCESSIBILITY (DEPLOY, RUNNING ICON, & THREE DOTS MENU) */
     header[data-testid="stHeader"] {{
         background-color: {sel_theme['bg']} !important;
-        background: transparent !important;
     }}
     header[data-testid="stHeader"] svg, header[data-testid="stHeader"] button, header[data-testid="stHeader"] div {{
         fill: {sel_theme['header_icon']} !important;
@@ -194,7 +196,7 @@ st.markdown(f"""
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.2.8 | Mobile Viewport CSS Alignment Patch</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.2.9 | Mobile Layer Refresh Model</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- MOBILE / ANDROID UX NOTICE HEADLINE ---------------- #
