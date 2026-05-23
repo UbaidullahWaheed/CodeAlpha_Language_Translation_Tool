@@ -48,10 +48,11 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
+    # MANUAL OVERRIDE MANIFEST: Explicit state keys force-repaint elements on mobile screens
     chosen_skin = st.radio(
         "Application Interface Skin",
-        ["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Vibrant Light)", "🪵 Amber Minimalist (Warm Mode)"],
-        index=["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Vibrant Light)", "🪵 Amber Minimalist (Warm Mode)"].index(st.session_state.ui_theme_mode)
+        ["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Light Mode)", "🪵 Amber Minimalist (Warm Mode)"],
+        index=["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Light Mode)", "🪵 Amber Minimalist (Warm Mode)"].index(st.session_state.ui_theme_mode)
     )
     st.session_state.ui_theme_mode = chosen_skin
     
@@ -69,85 +70,81 @@ with st.sidebar:
     )
     st.caption(f"Routing processing through **{ai_engine}** pipelines.")
 
-# ---------------- NATIVE SYSTEM DIRECT THEME INJECTION ---------------- #
+# ---------------- RESTORED CUSTOM THEME MATRIX ---------------- #
 theme_matrix = {
     "🌌 Deep Space (Dark Mode)": {
-        "text_color": "#ffffff", "label_color": "#ffffff",
-        "input_bg": "#161b22", "input_text": "#58a6ff", "border": "#30363d",
-        "placeholder": "#6e7681", "accent": "#58a6ff", 
-        "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
-        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.6.0 | Custom Dark Engine"
+        "panel_bg": "#161b22", "text": "#ffffff", "subtext": "#8b949e",
+        "input_bg": "#0d1117", "input_text": "#58a6ff", "border": "#30363d",
+        "placeholder": "#6e7681", "accent": "#58a6ff", "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
+        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.3.1 | Native DOM Extraction System"
     },
-    "☀️ Solar Flare (Vibrant Light)": {
-        "text_color": "#1e3a8a", "label_color": "#0f172a",
-        "input_bg": "#f0f4f8", "input_text": "#1e3a8a", "border": "#3b82f6",
-        "placeholder": "#2563eb", "accent": "#4f46e5", 
-        "btn_gradient": "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-        "tab_active": "#6366f1", "signature_text": "#1e3a8a", "signature": "Build 2.6.0 | Vibrant Light Matrix"
+    "☀️ Solar Flare (Light Mode)": {
+        "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#475569",
+        "input_bg": "#f1f5f9", "input_text": "#0f172a", "border": "#3b82f6",
+        "placeholder": "#2563eb", "accent": "#2563eb", "btn_gradient": "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+        "tab_active": "#2563eb", "signature_text": "#1e3a8a", "signature": "Build 2.3.1 | Native DOM Extraction System"
     },
     "🪵 Amber Minimalist (Warm Mode)": {
-        "text_color": "#433422", "label_color": "#433422",
+        "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
         "input_bg": "#f4f1ea", "input_text": "#433422", "border": "#d97706",
-        "placeholder": "#a16207", "accent": "#d97706", 
-        "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
-        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.6.0 | Custom Warm Engine"
+        "placeholder": "#a16207", "accent": "#d97706", "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
+        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.3.1 | Native DOM Extraction System"
     }
 }
 active_skin = theme_matrix[st.session_state.ui_theme_mode]
 
-# NATIVE CLASS OVERRIDES: Directly colors Streamlit labels, blocks, and text boxes
+# CONTAINER-BASED INJECTION SHEET (RESTORED EXACT STYLE ARCHITECTURE)
 st.html(f"""
 <style>
-    /* Force visibility onto all core typography elements */
-    [data-testid="stMarkdownContainer"] p, h1, h2, h3, h4, h5, h6, label, span, p {{
-        color: {active_skin['label_color']} !important;
+    .mobile-theme-card {{
+        background-color: {active_skin['panel_bg']} !important;
+        border: 2px solid {active_skin['border']} !important;
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 20px;
+        color: {active_skin['text']} !important;
     }}
     
-    /* Target Streamlit's native input area wrappers directly to eliminate the dark box */
-    .stTextArea textarea, [data-baseweb="textarea"] {{
-        background-color: {active_skin['input_bg']} !important;
-        color: {active_skin['input_text']} !important;
-        border: 2px solid {active_skin['border']} !important;
-        border-radius: 12px !important;
+    .mobile-theme-card h4, .mobile-theme-card p, .mobile-theme-card label {{
+        color: {active_skin['text']} !important;
     }}
     
-    /* Target Streamlit's select boxes and options dropdown wrappers */
-    .stSelectbox div[role="button"], div[data-baseweb="select"] {{
+    /* FIX: Targeted input styling override for custom input background */
+    .stTextArea textarea, .stSelectbox div[role="button"], div[data-baseweb="select"] {{
         background-color: {active_skin['input_bg']} !important;
         color: {active_skin['input_text']} !important;
-        border: 2px solid {active_skin['border']} !important;
-        border-radius: 8px !important;
+        border: 1px solid {active_skin['border']} !important;
+    }}
+    
+    .stTextArea textarea {{
+        color: {active_skin['text']} !important;
     }}
 
-    /* Global Placeholder Visibility Controls */
-    textarea::placeholder, input::placeholder {{
+    /* Placeholder Visibility Override */
+    .stTextArea textarea::placeholder {{
         color: {active_skin['placeholder']} !important;
         opacity: 1 !important;
         -webkit-text-fill-color: {active_skin['placeholder']} !important;
     }}
 
-    /* Action buttons skin injection */
     .stButton button {{
         background: {active_skin['btn_gradient']} !important;
         color: white !important;
         border: none !important;
-        font-weight: 800 !important;
+        font-weight: bold !important;
         height: 50px;
         width: 100%;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
     }}
 
-    /* Result Tab Navigation elements */
     .stTabs [data-baseweb="tab-list"] {{
-        background-color: {active_skin['input_bg']} !important;
-        border: 2px solid {active_skin['border']} !important;
-        border-radius: 10px;
+        background-color: {active_skin['panel_bg']} !important;
+        border: 1px solid {active_skin['border']};
+        border-radius: 8px;
         padding: 4px;
     }}
     .stTabs [data-baseweb="tab"] {{
-        color: {active_skin['label_color']} !important;
-        font-weight: 700 !important;
+        color: {active_skin['text']} !important;
     }}
     .stTabs [aria-selected="true"] {{
         background-color: {active_skin['tab_active']} !important;
@@ -155,23 +152,30 @@ st.html(f"""
         border-radius: 6px;
     }}
     
-    /* Custom Output Display fields */
     .output-content-block {{
-        background-color: {active_skin['input_bg']} !important;
-        color: {active_skin['input_text']} !important;
-        border: 2px solid {active_skin['border']} !important;
-        padding: 18px;
-        border-radius: 12px;
-        min-height: 110px;
-        font-weight: 500;
+        background-color: {active_skin['input_bg']};
+        color: {active_skin['text']};
+        border: 1px solid {active_skin['border']};
+        padding: 15px;
+        border-radius: 8px;
+        min-height: 100px;
     }}
 </style>
 """)
 
 # ---------------- HEADER ---------------- #
-st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900; background: linear-gradient(to right, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
+st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
 st.markdown(f'<div style="text-align:center;"><p style="font-size:14px; font-weight: 800; color: {active_skin["signature_text"]} !important;">{active_skin["signature"]}</p></div>', unsafe_allow_html=True)
 st.markdown("---")
+
+# ---------------- ANDROID ALERT BANNER BLOCK ---------------- #
+st.html("""
+<div style="background: linear-gradient(135deg, #4f46e5 0%, #db2777 100%); padding: 18px; border-radius: 12px; color: white; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+    <p style="margin: 0; font-size: 15px; font-weight: 700; text-align: center; color: white !important;">
+        📱 Android/Mobile Users: Open the left sidebar menu (top-left arrow &gt;) to change your Native Tongue Settings for perfect meaning context verification.
+    </p>
+</div>
+""")
 
 # ---------------- HELPER CONCURRENT TRANSLATION WORKER ---------------- #
 def parallel_translate_sentence(sentence, target_lang_code):
@@ -182,22 +186,25 @@ def parallel_translate_sentence(sentence, target_lang_code):
     except Exception:
         return sentence
 
-# ---------------- WORKSPACE WORKFLOW ---------------- #
-col1, col2 = st.columns(2)
+# ---------------- CONTAINER WORKSPACE SYSTEM (EXACT ORIGINAL RESTORED) ---------------- #
+st.markdown(f'<div class="mobile-theme-card">', unsafe_allow_html=True)
 
-with col1:
-    st.markdown("### 📥 Source Workspace")
-    entry_method = st.radio("Input Strategy Processing Mode", ["Universal Auto-Detect", "Phonetic Conversion"], horizontal=True)
-    source_text = st.text_area("Input Text Box Area", value=st.session_state.input_text_buffer, height=180, placeholder="Enter target text here...", label_visibility="collapsed")
+st.markdown("## 📥 Source Workspace")
+st.markdown("<p style='font-size: 14px; margin-bottom: 2px;'>enter the text to be translated</p>", unsafe_allow_html=True)
 
-with col2:
-    st.markdown("### 📤 Target Parameters")
-    st.markdown("<p style='font-size: 14px; margin-bottom: 2px;'>Select Destination Language</p>", unsafe_allow_html=True)
-    target_lang = st.selectbox("Destination Selector Language Target", options=language_catalog, index=language_catalog.index("korean") if "korean" in language_catalog else 0, label_visibility="collapsed")
-    target_code = language_dict[target_lang]
-    
-    st.markdown("<div style='margin-top: 52px;'></div>", unsafe_allow_html=True)
-    execute_flag = st.button("🚀 INITIATE TRANSLATION CORE")
+entry_method = st.radio("Input Strategy Processing Mode:", ["Universal Auto-Detect", "Phonetic Conversion"], horizontal=True, label_visibility="collapsed")
+source_text = st.text_area("Source Processing Input Window", value=st.session_state.input_text_buffer, height=180, placeholder="Enter target text or multi-line paragraphs here...", label_visibility="collapsed")
+
+st.markdown("---")
+
+st.markdown("## 📤 Target Workspace Parameters")
+target_lang = st.selectbox("Destination Selector Language Target", options=language_catalog, index=language_catalog.index("korean") if "korean" in language_catalog else 0)
+target_code = language_dict[target_lang]
+
+st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+execute_flag = st.button("🚀 INITIATE SYSTEM TRANSLATION")
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------- HIGH SPEED PARALLEL ENGINE EXECUTION ---------------- #
 if execute_flag:
@@ -234,9 +241,9 @@ if execute_flag:
     else:
         st.warning("Please enter text before running execution pipelines.")
 
-# ---------------- TABBED OUTPUT GENERATOR TIER ---------------- #
+# ---------------- TABBED DATA PROCESSING TIERS (EXACT ORIGINAL RESTORED) ---------------- #
 if st.session_state.translated_text:
-    st.markdown("---")
+    st.markdown(f'<div class="mobile-theme-card">', unsafe_allow_html=True)
     st.markdown("### 📊 Engine Data Manifest Output")
     tab_translation, tab_meaning, tab_phonetics = st.tabs([
         f"🌐 Translated Text ({st.session_state.last_target_lang.upper()})", 
@@ -264,15 +271,15 @@ if st.session_state.translated_text:
     st.markdown("<div style='margin-top:15px;'></div>", unsafe_allow_html=True)
     report_data = f"Source Text:\n{source_text}\n\nTranslation ({st.session_state.last_target_lang}):\n{st.session_state.translated_text}"
     st.download_button("💾 DOWNLOAD DATA MANIFEST (.TXT)", report_data, file_name="nexus_translation_manifest.txt")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------- HISTORICAL METRIC RECORDS ---------------- #
 if st.session_state.translation_history:
-    st.markdown("---")
     st.write("### 📜 Session History Logs")
     for log_node in st.session_state.translation_history[:3]:
         st.markdown(
-            f"<div style='background-color:{active_skin['input_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['label_color']};'>"
+            f"<div style='background-color:{active_skin['panel_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['text']};'>"
             f"<b>{log_node['lang'].upper()}:</b> {log_node['target']} <br>"
-            f"<small style='opacity: 0.75;'>Source: {log_node['source']}</small></div>", 
+            f"<small style='color:{active_skin['subtext']};'>Source: {log_node['source']}</small></div>", 
             unsafe_allow_html=True
         )
