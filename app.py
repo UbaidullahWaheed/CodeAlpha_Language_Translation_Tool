@@ -48,11 +48,10 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
-    # MANUAL OVERRIDE MANIFEST: Explicit state keys force-repaint elements on mobile screens
     chosen_skin = st.radio(
         "Application Interface Skin",
-        ["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Light Mode)", "🪵 Amber Minimalist (Warm Mode)"],
-        index=["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Light Mode)", "🪵 Amber Minimalist (Warm Mode)"].index(st.session_state.ui_theme_mode)
+        ["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Vibrant Light)", "🪵 Amber Minimalist (Warm Mode)"],
+        index=["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Vibrant Light)", "🪵 Amber Minimalist (Warm Mode)"].index(st.session_state.ui_theme_mode)
     )
     st.session_state.ui_theme_mode = chosen_skin
     
@@ -70,33 +69,36 @@ with st.sidebar:
     )
     st.caption(f"Routing processing through **{ai_engine}** pipelines.")
 
-# ---------------- ARCHITECTURE DESIGN PATTERN SCHEMA ---------------- #
+# ---------------- DYNAMIC COLOR MATRIX UPGRADE ---------------- #
 theme_matrix = {
     "🌌 Deep Space (Dark Mode)": {
         "panel_bg": "#161b22", "text": "#ffffff", "subtext": "#8b949e",
         "input_bg": "#0d1117", "input_text": "#58a6ff", "border": "#30363d",
-        "accent": "#58a6ff", "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
-        "tab_active": "#4f46e5", "signature": "Build 2.5.0 | Custom Dark Engine"
+        "placeholder": "#6e7681", "accent": "#58a6ff", 
+        "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
+        "tab_active": "#4f46e5", "signature": "Build 2.5.1 | Custom Dark Engine"
     },
-    "☀️ Solar Flare (Light Mode)": {
-        "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#475569",
-        "input_bg": "#f8fafc", "input_text": "#0f172a", "border": "#cbd5e1",
-        "accent": "#2563eb", "btn_gradient": "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-        "tab_active": "#2563eb", "signature": "Build 2.5.0 | Custom Light Engine"
+    "☀️ Solar Flare (Vibrant Light)": {
+        "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#3b82f6",
+        "input_bg": "#f0f4f8", "input_text": "#1e3a8a", "border": "#3b82f6",
+        "placeholder": "#2563eb", "accent": "#4f46e5", 
+        "btn_gradient": "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+        "tab_active": "#6366f1", "signature": "Build 2.5.1 | Vibrant Light Matrix"
     },
     "🪵 Amber Minimalist (Warm Mode)": {
         "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
         "input_bg": "#f4f1ea", "input_text": "#433422", "border": "#d97706",
-        "accent": "#d97706", "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
-        "tab_active": "#ea580c", "signature": "Build 2.5.0 | Custom Warm Engine"
+        "placeholder": "#a16207", "accent": "#d97706", 
+        "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
+        "tab_active": "#ea580c", "signature": "Build 2.5.1 | Custom Warm Engine"
     }
 }
 active_skin = theme_matrix[st.session_state.ui_theme_mode]
 
-# CONTAINER-BASED MOBILE STYLE INJECTION SHEET
+# ADVANCED MOBILE VIEWPORT CONTAINER STYLING SHEET
 st.html(f"""
 <style>
-    /* Universal internal styling variables targeting user-facing dashboard card systems */
+    /* Card panel base adjustments */
     .mobile-theme-card {{
         background-color: {active_skin['panel_bg']} !important;
         border: 2px solid {active_skin['border']} !important;
@@ -104,42 +106,63 @@ st.html(f"""
         padding: 24px;
         margin-bottom: 20px;
         color: {active_skin['text']} !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }}
     
     .mobile-theme-card h4, .mobile-theme-card p, .mobile-theme-card label {{
         color: {active_skin['text']} !important;
     }}
     
-    /* Input and Input Box styling adjustments */
+    /* Input windows structure styling configuration */
     .stTextArea textarea, .stSelectbox div[role="button"], div[data-baseweb="select"] {{
         background-color: {active_skin['input_bg']} !important;
         color: {active_skin['input_text']} !important;
-        border: 1px solid {active_skin['border']} !important;
+        border: 2px solid {active_skin['border']} !important;
+        border-radius: 8px !important;
     }}
     
     .stTextArea textarea {{
-        color: {active_skin['text']} !important;
+        color: {active_skin['input_text']} !important;
+        font-weight: 500 !important;
     }}
 
+    /* CRITICAL PLACEHOLDER VISIBILITY FIX FOR MOBILE DEVICES */
+    .stTextArea textarea::placeholder {{
+        color: {active_skin['placeholder']} !important;
+        opacity: 1 !important;
+        -webkit-text-fill-color: {active_skin['placeholder']} !important;
+        font-weight: bold !important;
+    }}
+    
+    .stTextArea textarea::-webkit-input-placeholder {{
+        color: {active_skin['placeholder']} !important;
+        opacity: 1 !important;
+        -webkit-text-fill-color: {active_skin['placeholder']} !important;
+    }}
+
+    /* Dynamic Button Configurations */
     .stButton button {{
         background: {active_skin['btn_gradient']} !important;
         color: white !important;
         border: none !important;
-        font-weight: bold !important;
-        height: 50px;
+        font-weight: 800 !important;
+        letter-spacing: 0.5px;
+        height: 52px;
         width: 100%;
         border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }}
 
-    /* Output Tabs Theme Adaptations */
+    /* Tabs Styling Control Architecture */
     .stTabs [data-baseweb="tab-list"] {{
         background-color: {active_skin['panel_bg']} !important;
-        border: 1px solid {active_skin['border']};
+        border: 2px solid {active_skin['border']};
         border-radius: 8px;
         padding: 4px;
     }}
     .stTabs [data-baseweb="tab"] {{
         color: {active_skin['text']} !important;
+        font-weight: 700 !important;
     }}
     .stTabs [aria-selected="true"] {{
         background-color: {active_skin['tab_active']} !important;
@@ -149,18 +172,19 @@ st.html(f"""
     
     .output-content-block {{
         background-color: {active_skin['input_bg']};
-        color: {active_skin['text']};
-        border: 1px solid {active_skin['border']};
+        color: {active_skin['input_text']};
+        border: 2px solid {active_skin['border']};
         padding: 15px;
         border-radius: 8px;
         min-height: 100px;
+        font-weight: 500;
     }}
 </style>
 """)
 
 # ---------------- HEADER ---------------- #
-st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
-st.markdown(f"<p style='text-align:center; font-size:13px; opacity:0.8;'>{active_skin['signature']}</p>", unsafe_allow_html=True)
+st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900; background: linear-gradient(to right, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
+st.markdown(f"<p style='text-align:center; font-size:13px; font-weight: 600; color: {active_skin['text']};'>{active_skin['signature']}</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- HELPER CONCURRENT TRANSLATION WORKER ---------------- #
