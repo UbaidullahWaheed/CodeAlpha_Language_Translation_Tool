@@ -65,8 +65,10 @@ theme_styles = {
         "text": "#ffffff", 
         "input_bg": "#151821", 
         "input_text": "#ffffff", 
-        "border": "rgba(255,255,255,0.1)",
-        "accent": "#4f46e5"
+        "border": "rgba(255,255,255,0.2)",
+        "accent": "#4f46e5",
+        "sidebar_bg": "#161925",
+        "sidebar_text": "#ffffff"
     },
     "☀️ Solar Flare (Light)": {
         "bg": "#f8fafc", 
@@ -74,8 +76,10 @@ theme_styles = {
         "text": "#0f172a", 
         "input_bg": "#f1f5f9", 
         "input_text": "#0f172a", 
-        "border": "rgba(15,23,42,0.1)",
-        "accent": "#2563eb"
+        "border": "rgba(15,23,42,0.15)",
+        "accent": "#2563eb",
+        "sidebar_bg": "#edf2f7",
+        "sidebar_text": "#0f172a"
     },
     "🪵 Amber Minimalist (Warm Theme)": {
         "bg": "#fdfbf7", 
@@ -84,33 +88,76 @@ theme_styles = {
         "input_bg": "#eae6dc", 
         "input_text": "#433422", 
         "border": "rgba(67,52,34,0.15)",
-        "accent": "#c2410c"
+        "accent": "#c2410c",
+        "sidebar_bg": "#f5f0e6",
+        "sidebar_text": "#433422"
     }
 }
 sel_theme = theme_styles[app_theme]
 
-# Injected styles specifically enforce native element overrides (textareas, headings, text)
+# Injected styles explicitly enforce native element overrides with precise contrast configurations
 st.markdown(f"""
 <style>
-    /* Global Application Canvas */
+    /* Global Application Canvas Base */
     .stApp {{
         background-color: {sel_theme['bg']} !important;
         color: {sel_theme['text']} !important;
     }}
     
-    /* Native App Text Blocks & Labels */
+    /* Native Main Workspace Elements Reset */
     .stApp p, .stApp label, .stApp span, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5 {{
         color: {sel_theme['text']} !important;
     }}
     
-    /* Global Ingress Control Enclosures (Text Areas & Fields) */
+    /* --- STRICT SIDEBAR COMPONENT BLOCK --- */
+    [data-testid="stSidebar"] {{
+        background-color: {sel_theme['sidebar_bg']} !important;
+        border-right: 1px solid {sel_theme['border']} !important;
+    }}
+    
+    /* Enforce comprehensive color overrides down all text children nodes inside the sidebar wrapper */
+    [data-testid="stSidebar"] *, 
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] h4, 
+    [data-testid="stSidebar"] h5,
+    [data-testid="stSidebar"] div {{
+        color: {sel_theme['sidebar_text']} !important;
+    }}
+    
+    /* Custom Sidebar Selectbox Background Fill Overrides */
+    [data-testid="stSidebar"] div[data-baseweb="select"] {{
+        background-color: {sel_theme['input_bg']} !important;
+        border: 1px solid {sel_theme['border']} !important;
+    }}
+    
+    /* --- GLOBAL INTERACTIVE COMPONENT ELEMENT HOVER CURSORS --- */
+    /* Forces the mouse pointer to switch from an arrow to an interaction hand selector across form controls */
+    div[data-baseweb="select"], 
+    .stSelectbox div, 
+    .stButton button, 
+    .stDownloadButton button,
+    input, 
+    textarea, 
+    label,
+    .stCheckbox label,
+    div[role="button"],
+    div[role="radiogroup"] label {{
+        cursor: pointer !important;
+    }}
+    
+    /* Main Workspace Text Areas and Forms */
     .stTextArea textarea, .stTextInput input, .stSelectbox div[data-baseweb="select"] {{
         background-color: {sel_theme['input_bg']} !important;
         color: {sel_theme['input_text']} !important;
         border: 1px solid {sel_theme['border']} !important;
     }}
     
-    /* Custom Structural Grid Layout Presentation Display Cards */
+    /* Presentation Output Structure Cards */
     .translation-card {{
         background-color: {sel_theme['card']} !important;
         border: 1px solid {sel_theme['border']};
@@ -124,7 +171,7 @@ st.markdown(f"""
         margin: 0px !important;
     }}
     
-    /* Dynamic Activity Stream Ledger Cards */
+    /* Historical Logs Cards Layout */
     .history-item {{
         background-color: {sel_theme['card']} !important;
         border-left: 4px solid {sel_theme['accent']} !important;
@@ -137,7 +184,7 @@ st.markdown(f"""
         margin-bottom: 8px;
     }}
     
-    /* Main Layout Accent Header styling */
+    /* Dynamic Header Title */
     .main-title {{
         font-size: 44px;
         font-weight: 800;
@@ -147,7 +194,7 @@ st.markdown(f"""
         margin-bottom: 5px;
     }}
     
-    /* Processing Button Style Sheet */
+    /* Submission processing buttons */
     .stButton button {{
         background: linear-gradient(135deg, {sel_theme['accent']} 0%, #db2777 100%) !important;
         color: white !important;
@@ -162,12 +209,18 @@ st.markdown(f"""
         transform: scale(1.005);
         box-shadow: 0px 8px 20px rgba(79, 70, 229, 0.3);
     }}
+    
+    /* Native Audio Integration Display Calibration Matrix */
+    stAudio audio, .stAudio div, audio {{
+        filter: invert({1 if app_theme == "🌌 Deep Space (Dark)" else 0});
+        border-radius: 30px;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
-st.markdown("💾 *Production-Ready Deploy Architecture Build 2.1.1 (Privacy Managed)*")
+st.markdown("💾 *Production-Ready Deploy Architecture Build 2.1.3 (Dynamic Text Stability)*")
 st.markdown("---")
 
 # ---------------- CACHED LANGUAGE RESOURCE MATRIX ---------------- #
