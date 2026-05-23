@@ -69,83 +69,76 @@ with st.sidebar:
     )
     st.caption(f"Routing processing through **{ai_engine}** pipelines.")
 
-# ---------------- DYNAMIC COLOR MATRIX UPGRADE ---------------- #
+# ---------------- NATIVE SYSTEM DIRECT THEME INJECTION ---------------- #
 theme_matrix = {
     "🌌 Deep Space (Dark Mode)": {
-        "panel_bg": "#161b22", "text": "#ffffff", "subtext": "#8b949e",
-        "input_bg": "#0d1117", "input_text": "#58a6ff", "border": "#30363d",
+        "text_color": "#ffffff", "label_color": "#ffffff",
+        "input_bg": "#161b22", "input_text": "#58a6ff", "border": "#30363d",
         "placeholder": "#6e7681", "accent": "#58a6ff", 
         "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
-        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.5.3 | Custom Dark Engine"
+        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.6.0 | Custom Dark Engine"
     },
     "☀️ Solar Flare (Vibrant Light)": {
-        "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#1e40af",
+        "text_color": "#1e3a8a", "label_color": "#0f172a",
         "input_bg": "#f0f4f8", "input_text": "#1e3a8a", "border": "#3b82f6",
         "placeholder": "#2563eb", "accent": "#4f46e5", 
         "btn_gradient": "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-        "tab_active": "#6366f1", "signature_text": "#1e3a8a", "signature": "Build 2.5.3 | Vibrant Light Matrix"
+        "tab_active": "#6366f1", "signature_text": "#1e3a8a", "signature": "Build 2.6.0 | Vibrant Light Matrix"
     },
     "🪵 Amber Minimalist (Warm Mode)": {
-        "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
+        "text_color": "#433422", "label_color": "#433422",
         "input_bg": "#f4f1ea", "input_text": "#433422", "border": "#d97706",
         "placeholder": "#a16207", "accent": "#d97706", 
         "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
-        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.5.3 | Custom Warm Engine"
+        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.6.0 | Custom Warm Engine"
     }
 }
 active_skin = theme_matrix[st.session_state.ui_theme_mode]
 
-# ADVANCED MOBILE VIEWPORT CONTAINER STYLING SHEET
+# NATIVE CLASS OVERRIDES: Directly colors Streamlit labels, blocks, and text boxes
 st.html(f"""
 <style>
-    /* Global Typography Syncs */
-    h4, p, label, span {{
-        color: {active_skin['text']} !important;
+    /* Force visibility onto all core typography elements */
+    [data-testid="stMarkdownContainer"] p, h1, h2, h3, h4, h5, h6, label, span, p {{
+        color: {active_skin['label_color']} !important;
     }}
     
-    /* Clean, single border input fields config */
-    .stTextArea textarea, .stSelectbox div[role="button"], div[data-baseweb="select"] {{
+    /* Target Streamlit's native input area wrappers directly to eliminate the dark box */
+    .stTextArea textarea, [data-baseweb="textarea"] {{
         background-color: {active_skin['input_bg']} !important;
         color: {active_skin['input_text']} !important;
         border: 2px solid {active_skin['border']} !important;
         border-radius: 12px !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
     }}
     
-    .stTextArea textarea {{
+    /* Target Streamlit's select boxes and options dropdown wrappers */
+    .stSelectbox div[role="button"], div[data-baseweb="select"] {{
+        background-color: {active_skin['input_bg']} !important;
         color: {active_skin['input_text']} !important;
-        font-weight: 500 !important;
+        border: 2px solid {active_skin['border']} !important;
+        border-radius: 8px !important;
     }}
 
-    /* CRITICAL PLACEHOLDER VISIBILITY FIX FOR MOBILE DEVICES */
-    .stTextArea textarea::placeholder {{
-        color: {active_skin['placeholder']} !important;
-        opacity: 1 !important;
-        -webkit-text-fill-color: {active_skin['placeholder']} !important;
-        font-weight: bold !important;
-    }}
-    
-    .stTextArea textarea::-webkit-input-placeholder {{
+    /* Global Placeholder Visibility Controls */
+    textarea::placeholder, input::placeholder {{
         color: {active_skin['placeholder']} !important;
         opacity: 1 !important;
         -webkit-text-fill-color: {active_skin['placeholder']} !important;
     }}
 
-    /* Dynamic Action Button styling */
+    /* Action buttons skin injection */
     .stButton button {{
         background: {active_skin['btn_gradient']} !important;
         color: white !important;
         border: none !important;
         font-weight: 800 !important;
-        letter-spacing: 0.5px;
-        height: 52px;
+        height: 50px;
         width: 100%;
         border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        margin-top: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }}
 
-    /* Tabs Layout Style Configuration */
+    /* Result Tab Navigation elements */
     .stTabs [data-baseweb="tab-list"] {{
         background-color: {active_skin['input_bg']} !important;
         border: 2px solid {active_skin['border']} !important;
@@ -153,7 +146,7 @@ st.html(f"""
         padding: 4px;
     }}
     .stTabs [data-baseweb="tab"] {{
-        color: {active_skin['text']} !important;
+        color: {active_skin['label_color']} !important;
         font-weight: 700 !important;
     }}
     .stTabs [aria-selected="true"] {{
@@ -162,16 +155,15 @@ st.html(f"""
         border-radius: 6px;
     }}
     
-    /* Dedicated output result card styles */
+    /* Custom Output Display fields */
     .output-content-block {{
-        background-color: {active_skin['panel_bg']};
-        color: {active_skin['input_text']};
-        border: 2px solid {active_skin['border']};
+        background-color: {active_skin['input_bg']} !important;
+        color: {active_skin['input_text']} !important;
+        border: 2px solid {active_skin['border']} !important;
         padding: 18px;
         border-radius: 12px;
         min-height: 110px;
         font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }}
 </style>
 """)
@@ -190,21 +182,22 @@ def parallel_translate_sentence(sentence, target_lang_code):
     except Exception:
         return sentence
 
-# ---------------- CLEAN UNBOXED WORKSPACE LAYOUT ---------------- #
+# ---------------- WORKSPACE WORKFLOW ---------------- #
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("#### 📥 Source Workspace")
-    entry_method = st.radio("Input Strategy Processing Mode:", ["Universal Auto-Detect", "Phonetic Conversion"], horizontal=True)
-    source_text = st.text_area("Source Processing Input Window", value=st.session_state.input_text_buffer, height=180, placeholder="Enter target text here...", label_visibility="collapsed")
+    st.markdown("### 📥 Source Workspace")
+    entry_method = st.radio("Input Strategy Processing Mode", ["Universal Auto-Detect", "Phonetic Conversion"], horizontal=True)
+    source_text = st.text_area("Input Text Box Area", value=st.session_state.input_text_buffer, height=180, placeholder="Enter target text here...", label_visibility="collapsed")
 
 with col2:
-    st.markdown("#### 📤 Target Workspace Parameters")
-    target_lang = st.selectbox("Destination Selector Language Target", options=language_catalog, index=language_catalog.index("korean") if "korean" in language_catalog else 0)
+    st.markdown("### 📤 Target Parameters")
+    st.markdown("<p style='font-size: 14px; margin-bottom: 2px;'>Select Destination Language</p>", unsafe_allow_html=True)
+    target_lang = st.selectbox("Destination Selector Language Target", options=language_catalog, index=language_catalog.index("korean") if "korean" in language_catalog else 0, label_visibility="collapsed")
     target_code = language_dict[target_lang]
     
-    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
-    execute_flag = st.button("🚀 INITIATE SYSTEM TRANSLATION")
+    st.markdown("<div style='margin-top: 52px;'></div>", unsafe_allow_html=True)
+    execute_flag = st.button("🚀 INITIATE TRANSLATION CORE")
 
 # ---------------- HIGH SPEED PARALLEL ENGINE EXECUTION ---------------- #
 if execute_flag:
@@ -241,7 +234,7 @@ if execute_flag:
     else:
         st.warning("Please enter text before running execution pipelines.")
 
-# ---------------- CLEAN UNBOXED TABBED OUTPUT TIER ---------------- #
+# ---------------- TABBED OUTPUT GENERATOR TIER ---------------- #
 if st.session_state.translated_text:
     st.markdown("---")
     st.markdown("### 📊 Engine Data Manifest Output")
@@ -278,8 +271,8 @@ if st.session_state.translation_history:
     st.write("### 📜 Session History Logs")
     for log_node in st.session_state.translation_history[:3]:
         st.markdown(
-            f"<div style='background-color:{active_skin['input_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['text']};'>"
+            f"<div style='background-color:{active_skin['input_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['label_color']};'>"
             f"<b>{log_node['lang'].upper()}:</b> {log_node['target']} <br>"
-            f"<small style='color:{active_skin['subtext']};'>Source: {log_node['source']}</small></div>", 
+            f"<small style='opacity: 0.75;'>Source: {log_node['source']}</small></div>", 
             unsafe_allow_html=True
         )
