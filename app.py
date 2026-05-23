@@ -76,21 +76,21 @@ theme_matrix = {
         "input_bg": "#0d1117", "input_text": "#58a6ff", "border": "#30363d",
         "placeholder": "#6e7681", "accent": "#58a6ff", 
         "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
-        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.5.2 | Custom Dark Engine"
+        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.5.3 | Custom Dark Engine"
     },
     "☀️ Solar Flare (Vibrant Light)": {
         "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#1e40af",
         "input_bg": "#f0f4f8", "input_text": "#1e3a8a", "border": "#3b82f6",
         "placeholder": "#2563eb", "accent": "#4f46e5", 
         "btn_gradient": "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-        "tab_active": "#6366f1", "signature_text": "#1e3a8a", "signature": "Build 2.5.2 | Vibrant Light Matrix"
+        "tab_active": "#6366f1", "signature_text": "#1e3a8a", "signature": "Build 2.5.3 | Vibrant Light Matrix"
     },
     "🪵 Amber Minimalist (Warm Mode)": {
         "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
         "input_bg": "#f4f1ea", "input_text": "#433422", "border": "#d97706",
         "placeholder": "#a16207", "accent": "#d97706", 
         "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
-        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.5.2 | Custom Warm Engine"
+        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.5.3 | Custom Warm Engine"
     }
 }
 active_skin = theme_matrix[st.session_state.ui_theme_mode]
@@ -98,27 +98,18 @@ active_skin = theme_matrix[st.session_state.ui_theme_mode]
 # ADVANCED MOBILE VIEWPORT CONTAINER STYLING SHEET
 st.html(f"""
 <style>
-    /* Card panel base adjustments */
-    .mobile-theme-card {{
-        background-color: {active_skin['panel_bg']} !important;
-        border: 2px solid {active_skin['border']} !important;
-        border-radius: 14px;
-        padding: 24px;
-        margin-bottom: 20px;
-        color: {active_skin['text']} !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }}
-    
-    .mobile-theme-card h4, .mobile-theme-card p, .mobile-theme-card label, .mobile-theme-card span {{
+    /* Global Typography Syncs */
+    h4, p, label, span {{
         color: {active_skin['text']} !important;
     }}
     
-    /* Input windows structure styling configuration */
+    /* Clean, single border input fields config */
     .stTextArea textarea, .stSelectbox div[role="button"], div[data-baseweb="select"] {{
         background-color: {active_skin['input_bg']} !important;
         color: {active_skin['input_text']} !important;
         border: 2px solid {active_skin['border']} !important;
-        border-radius: 8px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
     }}
     
     .stTextArea textarea {{
@@ -140,7 +131,7 @@ st.html(f"""
         -webkit-text-fill-color: {active_skin['placeholder']} !important;
     }}
 
-    /* Dynamic Button Configurations */
+    /* Dynamic Action Button styling */
     .stButton button {{
         background: {active_skin['btn_gradient']} !important;
         color: white !important;
@@ -149,15 +140,16 @@ st.html(f"""
         letter-spacing: 0.5px;
         height: 52px;
         width: 100%;
-        border-radius: 8px;
+        border-radius: 10px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        margin-top: 15px;
     }}
 
-    /* Tabs Styling Control Architecture */
+    /* Tabs Layout Style Configuration */
     .stTabs [data-baseweb="tab-list"] {{
-        background-color: {active_skin['panel_bg']} !important;
-        border: 2px solid {active_skin['border']};
-        border-radius: 8px;
+        background-color: {active_skin['input_bg']} !important;
+        border: 2px solid {active_skin['border']} !important;
+        border-radius: 10px;
         padding: 4px;
     }}
     .stTabs [data-baseweb="tab"] {{
@@ -170,21 +162,22 @@ st.html(f"""
         border-radius: 6px;
     }}
     
+    /* Dedicated output result card styles */
     .output-content-block {{
-        background-color: {active_skin['input_bg']};
+        background-color: {active_skin['panel_bg']};
         color: {active_skin['input_text']};
         border: 2px solid {active_skin['border']};
-        padding: 15px;
-        border-radius: 8px;
-        min-height: 100px;
+        padding: 18px;
+        border-radius: 12px;
+        min-height: 110px;
         font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }}
 </style>
 """)
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900; background: linear-gradient(to right, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
-# FIXED TEXT COLOR DYNAMIC GENERATOR FOR BUILD SIGNATURE LINE
 st.markdown(f'<div style="text-align:center;"><p style="font-size:14px; font-weight: 800; color: {active_skin["signature_text"]} !important;">{active_skin["signature"]}</p></div>', unsafe_allow_html=True)
 st.markdown("---")
 
@@ -197,8 +190,7 @@ def parallel_translate_sentence(sentence, target_lang_code):
     except Exception:
         return sentence
 
-# ---------------- CONTAINER STYLE WORKSPACE SYSTEM ---------------- #
-st.markdown(f'<div class="mobile-theme-card">', unsafe_allow_html=True)
+# ---------------- CLEAN UNBOXED WORKSPACE LAYOUT ---------------- #
 col1, col2 = st.columns(2)
 
 with col1:
@@ -211,9 +203,8 @@ with col2:
     target_lang = st.selectbox("Destination Selector Language Target", options=language_catalog, index=language_catalog.index("korean") if "korean" in language_catalog else 0)
     target_code = language_dict[target_lang]
     
-    st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
     execute_flag = st.button("🚀 INITIATE SYSTEM TRANSLATION")
-st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------- HIGH SPEED PARALLEL ENGINE EXECUTION ---------------- #
 if execute_flag:
@@ -250,9 +241,9 @@ if execute_flag:
     else:
         st.warning("Please enter text before running execution pipelines.")
 
-# ---------------- TABBED DATA PROCESSING TIERS ---------------- #
+# ---------------- CLEAN UNBOXED TABBED OUTPUT TIER ---------------- #
 if st.session_state.translated_text:
-    st.markdown(f'<div class="mobile-theme-card">', unsafe_allow_html=True)
+    st.markdown("---")
     st.markdown("### 📊 Engine Data Manifest Output")
     tab_translation, tab_meaning, tab_phonetics = st.tabs([
         f"🌐 Translated Text ({st.session_state.last_target_lang.upper()})", 
@@ -280,14 +271,14 @@ if st.session_state.translated_text:
     st.markdown("<div style='margin-top:15px;'></div>", unsafe_allow_html=True)
     report_data = f"Source Text:\n{source_text}\n\nTranslation ({st.session_state.last_target_lang}):\n{st.session_state.translated_text}"
     st.download_button("💾 DOWNLOAD DATA MANIFEST (.TXT)", report_data, file_name="nexus_translation_manifest.txt")
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------- HISTORICAL METRIC RECORDS ---------------- #
 if st.session_state.translation_history:
+    st.markdown("---")
     st.write("### 📜 Session History Logs")
     for log_node in st.session_state.translation_history[:3]:
         st.markdown(
-            f"<div style='background-color:{active_skin['panel_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['text']};'>"
+            f"<div style='background-color:{active_skin['input_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['text']};'>"
             f"<b>{log_node['lang'].upper()}:</b> {log_node['target']} <br>"
             f"<small style='color:{active_skin['subtext']};'>Source: {log_node['source']}</small></div>", 
             unsafe_allow_html=True
