@@ -158,13 +158,14 @@ st.markdown(f"""
         background: {sel_theme['download_btn']} !important; color: white !important;
         border: none !important; border-radius: 8px !important; width: 100%; font-weight: 700 !important; height: 45px;
     }}
-    .main-title {{ font-size: 38px; font-weight: 900; text-align: center; background: linear-gradient(to right, {sel_theme['accent']}, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 25px; }}
+    .main-title {{ font-size: 38px; font-weight: 900; text-align: center; background: linear-gradient(to right, {sel_theme['accent']}, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0px; }}
     .history-item {{ background-color: {sel_theme['card']}; border-left: 5px solid {sel_theme['accent']}; padding: 12px; margin-bottom: 6px; border-radius: 6px; }}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.2.6 | Workspace Redundancy Cleanup</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- HELPER CONCURRENT TRANSLATION WORKER ---------------- #
@@ -192,8 +193,8 @@ with col2:
     target_lang = st.selectbox("Destination Selector Language Target", options=language_catalog, index=language_catalog.index("korean") if "korean" in language_catalog else 0, label_visibility="collapsed")
     target_code = language_dict[target_lang]
     
-    st.markdown("<div style='margin-top: 35px;'></div>", unsafe_allow_html=True)
-    st.info(f"Pipeline State Vector configured to translate incoming sequences directly into **{target_lang.upper()}**.")
+    # FIX: Completely removed the st.info blue alert block element from here to keep the column clean
+    st.markdown("<div style='margin-top: 55px;'></div>", unsafe_allow_html=True)
     execute_flag = st.button("🚀 INITIATE GLOBAL SYSTEM TRANSLATION")
 st.markdown('</div>', unsafe_allow_html=True)
 
