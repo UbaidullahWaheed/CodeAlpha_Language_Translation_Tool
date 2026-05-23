@@ -4,16 +4,18 @@ from anyascii import anyascii
 from gtts import gTTS
 import io
 import time
+import re
+from concurrent.futures import ThreadPoolExecutor
 
 # ---------------- PRE-CONFIGURATION & THEME ENGINE ---------------- #
 st.set_page_config(
     page_title="NexusAI Universal Translation Matrix",
-    page_icon="🤖",
+    page_icon="🪐",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Initialize Session State Variables
+# Initialize Session State Variables Safely
 if "translated_text" not in st.session_state:
     st.session_state.translated_text = ""
 if "pronunciation_text" not in st.session_state:
@@ -22,206 +24,10 @@ if "meaning_context_text" not in st.session_state:
     st.session_state.meaning_context_text = ""
 if "last_target_lang" not in st.session_state:
     st.session_state.last_target_lang = ""
-if "render_id" not in st.session_state:
-    st.session_state.render_id = str(time.time())
 if "input_text_buffer" not in st.session_state:
     st.session_state.input_text_buffer = ""
 if "translation_history" not in st.session_state:
     st.session_state.translation_history = []
-
-# ---------------- SIDEBAR INTERFACE & CONFIGURATIONS ---------------- #
-with st.sidebar:
-    st.markdown("## ⚙️ Core Configuration Panel")
-    
-    app_theme = st.selectbox(
-        "Application Custom UI Skin",
-        ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"]
-    )
-    
-    user_native_lang = st.selectbox(
-        "Your Native Tongue (For Meaning Context)",
-        ["english", "korean", "chinese (simplified)", "japanese", "spanish", "french", "arabic", "hindi", "german", "urdu"],
-        index=0
-    )
-    
-    st.markdown("---")
-    st.markdown("### 🦾 AI Transformer Models")
-    ai_engine = st.selectbox(
-        "Translation Backend Core",
-        ["Nexus-Omni v4 (Low Latency)", "DeepL-Core Engine v2", "GPT-Translation-Matrix (Advanced)"]
-    )
-    st.caption(f"Routing processing through **{ai_engine}** pipelines.")
-    
-    st.markdown("---")
-    st.markdown("### 🛠️ UI Options")
-    enable_copy = st.checkbox("Show Copy Prompts", value=True)
-    enable_animations = st.checkbox("Enable Loading Micro-Animations", value=True)
-
-# ---------------- DYNAMIC GRAPHICS & CONTRAST THEME INJECTION ---------------- #
-theme_styles = {
-    "🌌 Deep Space (Dark)": {
-        "bg": "#0f1117", 
-        "card": "#1e2230", 
-        "text": "#ffffff", 
-        "input_bg": "#151821", 
-        "input_text": "#ffffff", 
-        "border": "rgba(255,255,255,0.2)",
-        "accent": "#4f46e5",
-        "sidebar_bg": "#161925",
-        "sidebar_text": "#ffffff"
-    },
-    "☀️ Solar Flare (Light)": {
-        "bg": "#f8fafc", 
-        "card": "#ffffff", 
-        "text": "#0f172a", 
-        "input_bg": "#f1f5f9", 
-        "input_text": "#0f172a", 
-        "border": "rgba(15,23,42,0.15)",
-        "accent": "#2563eb",
-        "sidebar_bg": "#edf2f7",
-        "sidebar_text": "#0f172a"
-    },
-    "🪵 Amber Minimalist (Warm Theme)": {
-        "bg": "#fdfbf7", 
-        "card": "#f4f1ea", 
-        "text": "#433422", 
-        "input_bg": "#eae6dc", 
-        "input_text": "#433422", 
-        "border": "rgba(67,52,34,0.15)",
-        "accent": "#c2410c",
-        "sidebar_bg": "#f5f0e6",
-        "sidebar_text": "#433422"
-    }
-}
-sel_theme = theme_styles[app_theme]
-
-# Injected styles explicitly enforce native element overrides with precise contrast configurations
-st.markdown(f"""
-<style>
-    /* Global Application Canvas Base */
-    .stApp {{
-        background-color: {sel_theme['bg']} !important;
-        color: {sel_theme['text']} !important;
-    }}
-    
-    /* Native Main Workspace Elements Reset */
-    .stApp p, .stApp label, .stApp span, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5 {{
-        color: {sel_theme['text']} !important;
-    }}
-    
-    /* --- STRICT SIDEBAR COMPONENT BLOCK --- */
-    [data-testid="stSidebar"] {{
-        background-color: {sel_theme['sidebar_bg']} !important;
-        border-right: 1px solid {sel_theme['border']} !important;
-    }}
-    
-    /* Enforce comprehensive color overrides down all text children nodes inside the sidebar wrapper */
-    [data-testid="stSidebar"] *, 
-    [data-testid="stSidebar"] p, 
-    [data-testid="stSidebar"] label, 
-    [data-testid="stSidebar"] span, 
-    [data-testid="stSidebar"] h1, 
-    [data-testid="stSidebar"] h2, 
-    [data-testid="stSidebar"] h3, 
-    [data-testid="stSidebar"] h4, 
-    [data-testid="stSidebar"] h5,
-    [data-testid="stSidebar"] div {{
-        color: {sel_theme['sidebar_text']} !important;
-    }}
-    
-    /* Custom Sidebar Selectbox Background Fill Overrides */
-    [data-testid="stSidebar"] div[data-baseweb="select"] {{
-        background-color: {sel_theme['input_bg']} !important;
-        border: 1px solid {sel_theme['border']} !important;
-    }}
-    
-    /* --- GLOBAL INTERACTIVE COMPONENT ELEMENT HOVER CURSORS --- */
-    /* Forces the mouse pointer to switch from an arrow to an interaction hand selector across form controls */
-    div[data-baseweb="select"], 
-    .stSelectbox div, 
-    .stButton button, 
-    .stDownloadButton button,
-    input, 
-    textarea, 
-    label,
-    .stCheckbox label,
-    div[role="button"],
-    div[role="radiogroup"] label {{
-        cursor: pointer !important;
-    }}
-    
-    /* Main Workspace Text Areas and Forms */
-    .stTextArea textarea, .stTextInput input, .stSelectbox div[data-baseweb="select"] {{
-        background-color: {sel_theme['input_bg']} !important;
-        color: {sel_theme['input_text']} !important;
-        border: 1px solid {sel_theme['border']} !important;
-    }}
-    
-    /* Presentation Output Structure Cards */
-    .translation-card {{
-        background-color: {sel_theme['card']} !important;
-        border: 1px solid {sel_theme['border']};
-        padding: 20px;
-        border-radius: 14px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        margin-bottom: 15px;
-    }}
-    .translation-card h4, .translation-card h5 {{
-        color: {sel_theme['text']} !important;
-        margin: 0px !important;
-    }}
-    
-    /* Historical Logs Cards Layout */
-    .history-item {{
-        background-color: {sel_theme['card']} !important;
-        border-left: 4px solid {sel_theme['accent']} !important;
-        border-top: 1px solid {sel_theme['border']} !important;
-        border-right: 1px solid {sel_theme['border']} !important;
-        border-bottom: 1px solid {sel_theme['border']} !important;
-        color: {sel_theme['text']} !important;
-        padding: 12px;
-        border-radius: 4px;
-        margin-bottom: 8px;
-    }}
-    
-    /* Dynamic Header Title */
-    .main-title {{
-        font-size: 44px;
-        font-weight: 800;
-        background: linear-gradient(45deg, {sel_theme['accent']}, #ec4899);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 5px;
-    }}
-    
-    /* Submission processing buttons */
-    .stButton button {{
-        background: linear-gradient(135deg, {sel_theme['accent']} 0%, #db2777 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 12px !important;
-        height: 52px;
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        transition: all 0.3s ease;
-    }}
-    .stButton button:hover {{
-        transform: scale(1.005);
-        box-shadow: 0px 8px 20px rgba(79, 70, 229, 0.3);
-    }}
-    
-    /* Native Audio Integration Display Calibration Matrix */
-    stAudio audio, .stAudio div, audio {{
-        filter: invert({1 if app_theme == "🌌 Deep Space (Dark)" else 0});
-        border-radius: 30px;
-    }}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------- HEADER ---------------- #
-st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
-st.markdown("💾 *Production-Ready Deploy Architecture Build 2.1.3 (Dynamic Text Stability)*")
-st.markdown("---")
 
 # ---------------- CACHED LANGUAGE RESOURCE MATRIX ---------------- #
 @st.cache_data
@@ -234,178 +40,233 @@ def fetch_language_matrix():
 language_dict = fetch_language_matrix()
 language_catalog = sorted(list(language_dict.keys()))
 
-# ---------------- MULTI-INPUT TELEMETRY MODALS ---------------- #
-panel_input_1, panel_input_2 = st.columns(2)
-
-with panel_input_1:
-    with st.expander("🎙️ Audio Stream Voice Input", expanded=False):
-        st.caption("Select an incoming voice sequence simulation down below:")
-        v_c1, v_c2 = st.columns(2)
-        with v_c1:
-            if st.button("🗣️ Mic Sim: 'Where is the station?'"):
-                st.session_state.input_text_buffer = "Where is the nearest transportation station?"
-        with v_c2:
-            if st.button("🗣️ Mic Sim: 'Welcome to our city'"):
-                st.session_state.input_text_buffer = "Welcome to our city, it is a pleasure to meet you."
-
-with panel_input_2:
-    with st.expander("📷 OCR Document / Camera Scan", expanded=False):
-        st.caption("Upload graphic files or trigger standard hardware emulator inputs:")
-        ocr_file = st.file_uploader("Upload Image Target Document", type=["jpg", "png", "jpeg", "webp"])
-        if ocr_file is not None:
-            st.session_state.input_text_buffer = "Hello world, I am translating this file script."
-            st.info("✅ OCR analysis successful! Text read complete.")
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# ---------------- CORE UI INPUT BLOCK ---------------- #
-grid_col1, grid_col2 = st.columns(2)
-
-with grid_col1:
-    st.markdown("### 📥 Source Transmission Target")
-    entry_method = st.radio(
-        "Ingress Parsing Execution Mode",
-        ["✨ Universal Auto-Detect Script Engine", "🔤 Phonetic Keyboard (Latin sounds to script conversions)"],
-        horizontal=True
+# ---------------- SIDEBAR INTERFACE & CONFIGURATIONS ---------------- #
+with st.sidebar:
+    st.markdown("## ⚙️ Core Configuration Panel")
+    
+    app_theme = st.selectbox(
+        "Application Custom UI Skin",
+        ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"]
     )
     
-    source_input_string = st.text_area(
-        "Source Text Capture Window",
-        value=st.session_state.input_text_buffer,
-        height=180,
-        placeholder="Populate characters or phonetics here...",
-        key="main_textarea_input"
-    )
-
-with grid_col2:
-    st.markdown("### 📤 Destination Parameters")
-    target_lang_selection = st.selectbox(
-        "Search & Match Target Output Language Target",
+    user_native_lang = st.selectbox(
+        "Your Native Tongue (For Meaning Context)",
         options=language_catalog,
-        index=language_catalog.index("korean") if "korean" in language_catalog else 0
+        index=language_catalog.index("english") if "english" in language_catalog else 0
     )
-    target_code_string = language_dict[target_lang_selection]
-
-# ---------------- COMPILATION ENGINE PIPELINE ---------------- #
-if st.button("🚀 INITIATE AI MATRIX TRANSLATION"):
-    cleansed_input = source_input_string.strip()
     
-    if not cleansed_input:
-        st.warning("Input buffer empty.")
+    st.markdown("---")
+    st.markdown("### 🦾 AI Transformer Models")
+    ai_engine = st.selectbox(
+        "Translation Backend Core",
+        ["Nexus-Omni v4 (Low Latency)", "DeepL-Core Engine v2", "GPT-Translation-Matrix (Advanced)"]
+    )
+    st.caption(f"Routing processing through **{ai_engine}** pipelines.")
+
+# ---------------- HIGH-CONTRAST VISIBILITY ARCHITECTURE ---------------- #
+theme_styles = {
+    "🌌 Deep Space (Dark)": {
+        "bg": "#0b0e14", "card": "#161b22", "text": "#ffffff", 
+        "input_bg": "#10141a", "input_text": "#58a6ff", "border": "#30363d",
+        "accent": "#4f46e5", "sidebar_bg": "#0d1117", "sidebar_text": "#f0f6fc",
+        "popover_bg": "#161b22", "download_btn": "linear-gradient(135deg, #238636 0%, #2ea043 100%)"
+    },
+    "☀️ Solar Flare (Light)": {
+        "bg": "#f8fafc", "card": "#ffffff", "text": "#0f172a",          
+        "input_bg": "#ffffff", "input_text": "#0f172a", "border": "#2563eb",        
+        "accent": "#2563eb", "sidebar_bg": "#f1f5f9", "sidebar_text": "#0f172a",
+        "popover_bg": "#ffffff", "download_btn": "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
+    },
+    "🪵 Amber Minimalist (Warm Theme)": {
+        "bg": "#f4f1ea", "card": "#fffcf0", "text": "#433422", 
+        "input_bg": "#ffffff", "input_text": "#433422", "border": "#c2410c",        
+        "accent": "#c2410c", "sidebar_bg": "#efebe3", "sidebar_text": "#433422",
+        "popover_bg": "#fffcf0", "download_btn": "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)"
+    }
+}
+sel_theme = theme_styles[app_theme]
+
+st.markdown(f"""
+<style>
+    .stApp {{ background-color: {sel_theme['bg']} !important; }}
+    h1, h2, h3, h4, h5, h6, p, label, span, small {{ color: {sel_theme['text']} !important; }}
+
+    [data-testid="stSidebar"] {{
+        background-color: {sel_theme['sidebar_bg']} !important;
+        border-right: 1px solid {sel_theme['border']};
+    }}
+    [data-testid="stSidebar"] * {{ color: {sel_theme['sidebar_text']} !important; }}
+
+    /* UNIFIED HIGH CONTRAST BOXES */
+    div[data-baseweb="select"], .stSelectbox div[role="button"], div[data-baseweb="select"] > div,
+    .stTextArea textarea, .stTextInput input {{
+        background-color: {sel_theme['input_bg']} !important;
+        color: {sel_theme['input_text']} !important;
+        border: 2px solid {sel_theme['border']} !important;
+        border-radius: 8px !important;
+    }}
+    
+    div[data-baseweb="select"] span, div[data-baseweb="select"] div, div[data-baseweb="select"] p,
+    div[data-baseweb="select"] [data-testid="stMarkdownContainer"] p, .stSelectbox text, .stSelectbox p, .stSelectbox span {{
+        color: {sel_theme['input_text']} !important;
+        -webkit-text-fill-color: {sel_theme['input_text']} !important;
+    }}
+
+    /* GLOBAL FLOATING DROPDOWN MENU FIX */
+    /* This targets the popover overlay menu list generated by Streamlit outside the standard containers */
+    div[data-baseweb="popover"] ul, div[data-baseweb="menu"] li {{
+        background-color: {sel_theme['popover_bg']} !important;
+        color: {sel_theme['input_text']} !important;
+    }}
+    div[data-baseweb="popover"] [role="option"] {{
+        color: {sel_theme['input_text']} !important;
+    }}
+
+    /* DROPDOWN ARROW VISIBILITY FIX */
+    div[data-baseweb="select"] svg, .stSelectbox svg, [data-testid="stSidebar"] svg {{
+        fill: {sel_theme['input_text']} !important;
+        color: {sel_theme['input_text']} !important;
+    }}
+
+    /* BLINKING TEXT CURSOR */
+    .stTextArea textarea, .stTextInput input {{
+        cursor: text !important;
+        caret-color: {sel_theme['input_text']} !important;
+    }}
+
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 8px; background-color: {sel_theme['card']} !important;
+        padding: 6px 12px; border-radius: 8px; border: 1px solid {sel_theme['border']};
+    }}
+    .stTabs [data-baseweb="tab"] {{
+        height: 40px; white-space: pre; background-color: transparent !important;
+        border-radius: 6px; color: {sel_theme['text']} !important; font-weight: 600;
+    }}
+    .stTabs [aria-selected="true"] {{ background-color: {sel_theme['accent']} !important; color: white !important; }}
+    .app-workspace-panel {{ background-color: {sel_theme['card']} !important; border: 1px solid {sel_theme['border']}; border-radius: 12px; padding: 24px; margin-bottom: 20px; }}
+    
+    div[data-baseweb="select"], div[data-baseweb="select"] *, .stSelectbox div[role="button"],
+    button, .stButton button, .stDownloadButton button, .stTabs [data-baseweb="tab"], .stCheckbox label {{
+        cursor: pointer !important;
+    }}
+
+    .stButton button {{
+        background: linear-gradient(135deg, {sel_theme['accent']} 0%, #db2777 100%) !important;
+        color: white !important; font-weight: 700 !important; border: none !important;
+        border-radius: 8px !important; width: 100%; height: 50px; letter-spacing: 0.5px;
+    }}
+    .stDownloadButton button {{
+        background: {sel_theme['download_btn']} !important; color: white !important;
+        border: none !important; border-radius: 8px !important; width: 100%; font-weight: 700 !important; height: 45px;
+    }}
+    .main-title {{ font-size: 38px; font-weight: 900; text-align: center; background: linear-gradient(to right, {sel_theme['accent']}, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0px; }}
+    .history-item {{ background-color: {sel_theme['card']}; border-left: 5px solid {sel_theme['accent']}; padding: 12px; margin-bottom: 6px; border-radius: 6px; }}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------- HEADER ---------------- #
+st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8;'>Build 2.2.4 | Popover Menu & Context Verification Fix</p>", unsafe_allow_html=True)
+st.markdown("---")
+
+# ---------------- HELPER CONCURRENT TRANSLATION WORKER ---------------- #
+def parallel_translate_sentence(sentence, target_lang_code):
+    if not sentence.strip():
+        return ""
+    try:
+        return GoogleTranslator(source='auto', target=target_lang_code).translate(sentence)
+    except Exception:
+        return sentence
+
+# ---------------- ENTERPRISE APPLICATION CORE LAYOUT ---------------- #
+st.markdown('<div class="app-workspace-panel">', unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("#### 📥 Source Workspace")
+    st.markdown("<p style='font-size:14px; margin-top:-5px; margin-bottom:15px; opacity:0.85;'>enter the text to be translated</p>", unsafe_allow_html=True)
+    entry_method = st.radio("Input Strategy Processing Mode:", ["Universal Auto-Detect", "Phonetic Conversion"], horizontal=True, label_visibility="collapsed")
+    source_text = st.text_area("Source Processing Input Window", value=st.session_state.input_text_buffer, height=220, placeholder="Enter target text or multi-line paragraphs here...", label_visibility="collapsed")
+
+with col2:
+    st.markdown("#### 📤 Target Workspace Parameters")
+    st.markdown("<p style='font-size:14px; margin-top:-5px; margin-bottom:15px; opacity:0.85;'>translate to</p>", unsafe_allow_html=True)
+    target_lang = st.selectbox("Destination Selector Language Target", options=language_catalog, index=language_catalog.index("korean") if "korean" in language_catalog else 0, label_visibility="collapsed")
+    target_code = language_dict[target_lang]
+    
+    st.markdown("<div style='margin-top: 35px;'></div>", unsafe_allow_html=True)
+    st.info(f"Pipeline State Vector configured to translate incoming sequences directly into **{target_lang.upper()}**.")
+    execute_flag = st.button("🚀 INITIATE GLOBAL SYSTEM TRANSLATION")
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------------- HIGH SPEED PARALLEL ENGINE EXECUTION ---------------- #
+if execute_flag:
+    cleaned_input_chunk = source_text.strip()
+    if cleaned_input_chunk:
+        try:
+            sentence_tokens = re.split(r'(?<=[.!?])\s+|\n', cleaned_input_chunk)
+            sentence_tokens = [s.strip() for s in sentence_tokens if s.strip()]
+            
+            # 1. Translate Source -> Target Language
+            with ThreadPoolExecutor(max_workers=min(10, len(sentence_tokens))) as executor:
+                translated_results = list(executor.map(lambda s: parallel_translate_sentence(s, target_code), sentence_tokens))
+            translated = " ".join(translated_results)
+            
+            # 2. Translate Target Language -> User's Selected Native Tongue (Meaning Context Verification)
+            native_code = language_dict.get(user_native_lang, 'en')
+            if target_code == native_code:
+                meaning = translated
+            else:
+                with ThreadPoolExecutor(max_workers=min(10, len(translated_results))) as executor:
+                    meaning_results = list(executor.map(lambda s: parallel_translate_sentence(s, native_code), translated_results))
+                meaning = " ".join(meaning_results)
+            
+            phonetic = anyascii(translated) if target_code not in ['en'] else "Latin base script allocation."
+            
+            st.session_state.translated_text = translated
+            st.session_state.pronunciation_text = phonetic
+            st.session_state.meaning_context_text = meaning
+            st.session_state.last_target_lang = target_lang
+            
+            st.session_state.translation_history.insert(0, {"source": cleaned_input_chunk, "target": translated, "lang": target_lang})
+        except Exception as engine_fault:
+            st.error(f"Execution Exception Core Interrupt Error: {engine_fault}")
     else:
-        if enable_animations:
-            loading_placeholder = st.empty()
-            with loading_placeholder.container():
-                st.markdown(f"""
-                <div style='text-align: center; padding: 30px;'>
-                    <div style='display: inline-block; width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid {sel_theme['accent']}; border-radius: 50%; animation: spin 1s linear infinite;'></div>
-                    <h5 style='margin-top: 15px; color: {sel_theme['text']};'>Synthesizing AI Core Parsing Pipelines...</h5>
-                </div>
-                <style>@keyframes spin {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}</style>
-                """, unsafe_allow_html=True)
-                time.sleep(1.0)
-            loading_placeholder.empty()
+        st.warning("Incoming data frame empty. Please input characters before execution.")
 
-        try:
-            calculated_source_code = "auto"
-            
-            if "Phonetic Keyboard" in entry_method:
-                try:
-                    from translator import translate_text
-                    cleansed_input = translate_text(cleansed_input, "en", target_code_string)
-                    calculated_source_code = target_code_string
-                except Exception:
-                    cleansed_input = GoogleTranslator(source='en', target=target_code_string).translate(cleansed_input)
-                    calculated_source_code = target_code_string
-
-            # 1️⃣ Core Translation Pass
-            compiled_target_translation = GoogleTranslator(source=calculated_source_code, target=target_code_string).translate(cleansed_input)
-
-            # 2️⃣ Transliteration Generation Block
-            compiled_phonetic_guide = ""
-            if target_code_string not in ["en", "es", "fr", "de", "it"]:
-                compiled_phonetic_guide = anyascii(compiled_target_translation)
-            else:
-                compiled_phonetic_guide = "Phonetic breakdown omitted for standard Latin script types."
-
-            # 3️⃣ Compute Context-Meaning Array Mapping
-            computed_user_native_code = language_dict.get(user_native_lang, "en")
-            if target_code_string == computed_user_native_code:
-                compiled_native_meaning = compiled_target_translation
-            else:
-                compiled_native_meaning = GoogleTranslator(source=target_code_string, target=computed_user_native_code).translate(compiled_target_translation)
-
-            # Synchronize states
-            st.session_state.translated_text = compiled_target_translation
-            st.session_state.pronunciation_text = compiled_phonetic_guide
-            st.session_state.meaning_context_text = compiled_native_meaning
-            st.session_state.last_target_lang = target_lang_selection.title()
-            st.session_state.render_id = str(time.time())
-            
-            # Save transaction records directly into local history arrays
-            st.session_state.translation_history.insert(0, {
-                "source": cleansed_input,
-                "target": compiled_target_translation,
-                "lang": target_lang_selection.title()
-            })
-
-        except Exception as system_fault_error:
-            st.error(f"AI pipeline compilation exception error occurred: {system_fault_error}")
-
-# ---------------- OUTPUT SYSTEM CONFIGURATION CARDS ---------------- #
+# ---------------- INTERNATIONAL TABBED OUTPUT TIER ---------------- #
 if st.session_state.translated_text:
-    st.markdown("---")
+    st.markdown("### 📊 Engine Data Manifest Output")
+    tab_translation, tab_meaning, tab_phonetics = st.tabs([
+        f"🌐 Translated Text ({st.session_state.last_target_lang.upper()})", 
+        f"📖 Meaning Context ({user_native_lang.upper()})", 
+        "🔤 Phonetic Pronunciation Guide"
+    ])
     
-    out_panel_col1, out_panel_col2 = st.columns(2)
-    
-    with out_panel_col1:
-        st.markdown(f'<div class="translation-card"><h4>🌐 Target Translation Output ({st.session_state.last_target_lang})</h4></div>', unsafe_allow_html=True)
-        st.text_area("Script Display Output", value=st.session_state.translated_text, height=120, key=f"scr_{st.session_state.render_id}", label_visibility="collapsed")
-        
-        # High-Fidelity Audio Feed Generation Block (TTS System)
+    with tab_translation:
+        st.markdown(f"<div style='background-color:{sel_theme['card']}; border:1px solid {sel_theme['border']}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.translated_text}</div>", unsafe_allow_html=True)
         try:
-            tts_engine_object = gTTS(text=st.session_state.translated_text, lang=target_code_string, slow=False)
-            audio_memory_buffer = io.BytesIO()
-            tts_engine_object.write_to_fp(audio_memory_buffer)
-            audio_memory_buffer.seek(0)
-            st.audio(audio_memory_buffer, format="audio/mp3")
-        except Exception:
+            tts = gTTS(text=st.session_state.translated_text, lang=target_code)
+            audio_fp = io.BytesIO()
+            tts.write_to_fp(audio_fp)
+            st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+            st.audio(audio_fp)
+        except:
             pass
-        
-        if st.session_state.pronunciation_text:
-            st.markdown('<div class="translation-card" style="margin-top:15px; padding:12px;"><h5>🔤 Phonetic Pronunciation Guide</h5></div>', unsafe_allow_html=True)
-            st.text_area("Pronunciation Display Output", value=st.session_state.pronunciation_text, height=100, key=f"pron_{st.session_state.render_id}", label_visibility="collapsed")
-            
-    with out_panel_col2:
-        st.markdown(f'<div class="translation-card"><h4>📖 Structural Meaning Context ({user_native_lang.title()})</h4></div>', unsafe_allow_html=True)
-        st.text_area("Meaning Display Output", value=st.session_state.meaning_context_text, height=120, key=f"mean_{st.session_state.render_id}", label_visibility="collapsed")
-        
-        # Compile Downloadable Report Document Asset
-        download_payload_data = (
-            f"=== NEXUSAI APP MANIFEST SUMMARY ===\n"
-            f"Target Dialect Language: {st.session_state.last_target_lang}\n"
-            f"Native Translation: {st.session_state.translated_text}\n"
-            f"Romanized Sound Guide: {st.session_state.pronunciation_text}\n"
-            f"Context Native Meaning: {st.session_state.meaning_context_text}\n"
-        )
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.download_button(
-            label="💾 DOWNLOAD TRANSLATION MANIFEST (.TXT)",
-            data=download_payload_data,
-            file_name=f"nexus_translation_{st.session_state.render_id}.txt",
-            mime="text/plain"
-        )
 
-# ---------------- HISTORICAL TRANSACTION LOG PANEL ---------------- #
+    with tab_meaning:
+        st.markdown(f"<div style='background-color:{sel_theme['card']}; border:1px solid {sel_theme['border']}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.meaning_context_text}</div>", unsafe_allow_html=True)
+
+    with tab_phonetics:
+        st.markdown(f"<div style='background-color:{sel_theme['card']}; border:1px solid {sel_theme['border']}; padding:20px; border-radius:8px; min-height:120px;'>{st.session_state.pronunciation_text}</div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='margin-top:15px;'></div>", unsafe_allow_html=True)
+    report_data = f"Source Text:\n{source_text}\n\nTranslation ({st.session_state.last_target_lang}):\n{st.session_state.translated_text}\n\nContext Meaning:\n{st.session_state.meaning_context_text}"
+    st.download_button("💾 DOWNLOAD DATA INTERCHANGE MANIFEST (.TXT)", report_data, file_name="nexus_translation_manifest.txt")
+
+# ---------------- HISTORICAL METRIC RECORDS ---------------- #
 if st.session_state.translation_history:
-    st.markdown("---")
-    st.markdown("### 📜 Session Historical Analytics Activity Log")
-    
-    for idx, item in enumerate(st.session_state.translation_history[:4]): # Keep frame output to last 4 transactions
-        st.markdown(f"""
-        <div class="history-item">
-            <strong>Input String:</strong> {item['source']} <br>
-            <strong>[{item['lang']}] Translation:</strong> {item['target']}
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.write("### 📜 Session History Logs")
+    for log_node in st.session_state.translation_history[:3]:
+        st.markdown(f"<div class='history-item'><b>{log_node['lang'].upper()}:</b> {log_node['target']} <br><small style='opacity:0.7;'>Source String: {log_node['source']}</small></div>", unsafe_allow_html=True)
