@@ -44,6 +44,7 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
+    # We maintain the key so Streamlit completely forces a rerun across mobile shadows
     app_theme = st.selectbox(
         "Application Custom UI Skin",
         ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"],
@@ -71,50 +72,42 @@ theme_styles = {
         "input_bg": "#10141a", "input_text": "#58a6ff", "border": "#30363d",
         "accent": "#4f46e5", "sidebar_bg": "#0d1117", "sidebar_text": "#f0f6fc",
         "popover_bg": "#161b22", "download_btn": "linear-gradient(135deg, #238636 0%, #2ea043 100%)",
-        "header_icon": "#ffffff",
-        "meta_scheme": "dark" # Signals phone rendering engine to use dark modes
+        "header_icon": "#ffffff", "meta_scheme": "dark"
     },
     "☀️ Solar Flare (Light)": {
         "bg": "#f8fafc", "card": "#ffffff", "text": "#0f172a",          
         "input_bg": "#ffffff", "input_text": "#0f172a", "border": "#2563eb",        
         "accent": "#2563eb", "sidebar_bg": "#f1f5f9", "sidebar_text": "#0f172a",
         "popover_bg": "#ffffff", "download_btn": "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-        "header_icon": "#0f172a",
-        "meta_scheme": "light" # Signals phone rendering engine to break out of forced dark modes
+        "header_icon": "#0f172a", "meta_scheme": "light"
     },
     "🪵 Amber Minimalist (Warm Theme)": {
         "bg": "#f4f1ea", "card": "#fffcf0", "text": "#433422", 
         "input_bg": "#ffffff", "input_text": "#433422", "border": "#c2410c",        
         "accent": "#c2410c", "sidebar_bg": "#efebe3", "sidebar_text": "#433422",
         "popover_bg": "#fffcf0", "download_btn": "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)",
-        "header_icon": "#433422",
-        "meta_scheme": "light"
+        "header_icon": "#433422", "meta_scheme": "light"
     }
 }
 sel_theme = theme_styles[app_theme]
 
-# CRITICAL FIX: Injects metadata directly to control browser-level rendering engines on Android
-st.markdown(f"""
-    <html style="color-scheme: {sel_theme['meta_scheme']};">
-    <head>
-        <meta name="color-scheme" content="{sel_theme['meta_scheme']}">
-        <meta name="theme-color" content="{sel_theme['bg']}">
-    </head>
-    </html>
-""", unsafe_allow_html=True)
-
-st.markdown(f"""
+# FIXED MOBILE DOM OVERRIDE: Using st.html explicitly targets the top-level window layout on mobile devices
+st.html(f"""
 <style>
-    /* Force color layout parameters globally down the DOM tree */
-    html, body, .stApp, div[data-testid="stAppViewContainer"], div[data-testid="stAppViewBlockContainer"] {{ 
-        background-color: {sel_theme['bg']} !important; 
+    /* Absolute target paths to break through mobile viewport shadow wrappers */
+    html, body, [data-testid="stAppViewContainer"], .stApp {{
+        background-color: {sel_theme['bg']} !important;
     }}
     
-    h1, h2, h3, h4, h5, h6, p, label, span, small {{ color: {sel_theme['text']} !important; }}
+    /* Make sure all mobile text follows the chosen color scheme */
+    h1, h2, h3, h4, h5, h6, p, label, span, small, li, [data-testid="stMarkdownContainer"] p {{ 
+        color: {sel_theme['text']} !important; 
+    }}
 
-    /* TOP EXTRUDED BANNER ACCESSIBILITY (DEPLOY, RUNNING ICON, & THREE DOTS MENU) */
-    header[data-testid="stHeader"] {{
+    /* FIXED MOBILE BAR VIEWPORTS (DEPLOY & THREE DOTS ICON POSITIONING) */
+    header[data-testid="stHeader"], [data-testid="stHeader"]::before {{
         background-color: {sel_theme['bg']} !important;
+        background: {sel_theme['bg']} !important;
     }}
     header[data-testid="stHeader"] svg, header[data-testid="stHeader"] button, header[data-testid="stHeader"] div {{
         fill: {sel_theme['header_icon']} !important;
@@ -127,7 +120,7 @@ st.markdown(f"""
     }}
     [data-testid="stSidebar"] * {{ color: {sel_theme['sidebar_text']} !important; }}
 
-    /* UNIFIED HIGH CONTRAST BOXES */
+    /* UNIVERSAL CONTRAST FORM LAYOUT CONTROLS */
     div[data-baseweb="select"], .stSelectbox div[role="button"], div[data-baseweb="select"] > div,
     .stTextArea textarea, .stTextInput input {{
         background-color: {sel_theme['input_bg']} !important;
@@ -137,27 +130,22 @@ st.markdown(f"""
     }}
     
     div[data-baseweb="select"] span, div[data-baseweb="select"] div, div[data-baseweb="select"] p,
-    div[data-baseweb="select"] [data-testid="stMarkdownContainer"] p, .stSelectbox text, .stSelectbox p, .stSelectbox span {{
+    .stSelectbox text, .stSelectbox p, .stSelectbox span {{
         color: {sel_theme['input_text']} !important;
         -webkit-text-fill-color: {sel_theme['input_text']} !important;
     }}
 
-    /* GLOBAL FLOATING DROPDOWN MENU FIX */
-    div[data-baseweb="popover"] ul, div[data-baseweb="menu"] li {{
+    /* FLOATING OVERLAY MENUS FOR ANDROID DROPDOWNS */
+    div[data-baseweb="popover"] ul, div[data-baseweb="menu"] li, div[data-baseweb="popover"] [role="option"] {{
         background-color: {sel_theme['popover_bg']} !important;
         color: {sel_theme['input_text']} !important;
     }}
-    div[data-baseweb="popover"] [role="option"] {{
-        color: {sel_theme['input_text']} !important;
-    }}
 
-    /* DROPDOWN ARROW VISIBILITY FIX */
     div[data-baseweb="select"] svg, .stSelectbox svg, [data-testid="stSidebar"] svg {{
         fill: {sel_theme['input_text']} !important;
         color: {sel_theme['input_text']} !important;
     }}
 
-    /* BLINKING TEXT CURSOR */
     .stTextArea textarea, .stTextInput input {{
         cursor: text !important;
         caret-color: {sel_theme['input_text']} !important;
@@ -204,11 +192,11 @@ st.markdown(f"""
     }}
     .mobile-instruction-banner span {{ color: white !important; font-weight: 800; }}
 </style>
-""", unsafe_allow_html=True)
+""")
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.3.0 | Android Rendering Engine Meta Fix</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.3.1 | Native DOM Extraction System</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- MOBILE / ANDROID UX NOTICE HEADLINE ---------------- #
