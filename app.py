@@ -44,7 +44,6 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
-    # Force instant re-evaluation using the system state key tracking model
     app_theme = st.selectbox(
         "Application Custom UI Skin",
         ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"],
@@ -72,29 +71,42 @@ theme_styles = {
         "input_bg": "#10141a", "input_text": "#58a6ff", "border": "#30363d",
         "accent": "#4f46e5", "sidebar_bg": "#0d1117", "sidebar_text": "#f0f6fc",
         "popover_bg": "#161b22", "download_btn": "linear-gradient(135deg, #238636 0%, #2ea043 100%)",
-        "header_icon": "#ffffff"
+        "header_icon": "#ffffff",
+        "meta_scheme": "dark" # Signals phone rendering engine to use dark modes
     },
     "☀️ Solar Flare (Light)": {
         "bg": "#f8fafc", "card": "#ffffff", "text": "#0f172a",          
         "input_bg": "#ffffff", "input_text": "#0f172a", "border": "#2563eb",        
         "accent": "#2563eb", "sidebar_bg": "#f1f5f9", "sidebar_text": "#0f172a",
         "popover_bg": "#ffffff", "download_btn": "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-        "header_icon": "#0f172a"
+        "header_icon": "#0f172a",
+        "meta_scheme": "light" # Signals phone rendering engine to break out of forced dark modes
     },
     "🪵 Amber Minimalist (Warm Theme)": {
         "bg": "#f4f1ea", "card": "#fffcf0", "text": "#433422", 
         "input_bg": "#ffffff", "input_text": "#433422", "border": "#c2410c",        
         "accent": "#c2410c", "sidebar_bg": "#efebe3", "sidebar_text": "#433422",
         "popover_bg": "#fffcf0", "download_btn": "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)",
-        "header_icon": "#433422"
+        "header_icon": "#433422",
+        "meta_scheme": "light"
     }
 }
 sel_theme = theme_styles[app_theme]
 
+# CRITICAL FIX: Injects metadata directly to control browser-level rendering engines on Android
+st.markdown(f"""
+    <html style="color-scheme: {sel_theme['meta_scheme']};">
+    <head>
+        <meta name="color-scheme" content="{sel_theme['meta_scheme']}">
+        <meta name="theme-color" content="{sel_theme['bg']}">
+    </head>
+    </html>
+""", unsafe_allow_html=True)
+
 st.markdown(f"""
 <style>
-    /* MOBILE ENGINE FIX: Force override parent layout background wrappers on touch viewports */
-    .stApp, div[data-testid="stAppViewContainer"], div[data-testid="stAppViewBlockContainer"] {{ 
+    /* Force color layout parameters globally down the DOM tree */
+    html, body, .stApp, div[data-testid="stAppViewContainer"], div[data-testid="stAppViewBlockContainer"] {{ 
         background-color: {sel_theme['bg']} !important; 
     }}
     
@@ -196,7 +208,7 @@ st.markdown(f"""
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.2.9 | Mobile Layer Refresh Model</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.3.0 | Android Rendering Engine Meta Fix</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- MOBILE / ANDROID UX NOTICE HEADLINE ---------------- #
