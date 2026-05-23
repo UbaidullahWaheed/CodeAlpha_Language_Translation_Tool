@@ -48,7 +48,6 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
-    # MANUAL OVERRIDE MANIFEST: Explicit state keys force-repaint elements on mobile screens
     chosen_skin = st.radio(
         "Application Interface Skin",
         ["🌌 Deep Space (Dark Mode)", "☀️ Solar Flare (Light Mode)", "🪵 Amber Minimalist (Warm Mode)"],
@@ -70,32 +69,37 @@ with st.sidebar:
     )
     st.caption(f"Routing processing through **{ai_engine}** pipelines.")
 
-# ---------------- RESTORED CUSTOM THEME MATRIX ---------------- #
+# ---------------- THEME CONFIGURATION MATRIX WITH MAIN GLOBAL BACKGROUNDS ---------------- #
 theme_matrix = {
     "🌌 Deep Space (Dark Mode)": {
-        "panel_bg": "#161b22", "text": "#ffffff", "subtext": "#8b949e",
-        "input_bg": "#0d1117", "input_text": "#58a6ff", "border": "#30363d",
+        "global_bg": "#0d1117", "panel_bg": "#161b22", "text": "#ffffff", "subtext": "#8b949e",
+        "input_bg": "#161b22", "input_text": "#58a6ff", "border": "#30363d",
         "placeholder": "#6e7681", "accent": "#58a6ff", "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
-        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.3.1 | Native DOM Extraction System"
+        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.6.2 | Direct Engine Synchronization"
     },
     "☀️ Solar Flare (Light Mode)": {
-        "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#475569",
+        "global_bg": "#f8fafc", "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#475569",
         "input_bg": "#f1f5f9", "input_text": "#0f172a", "border": "#3b82f6",
         "placeholder": "#2563eb", "accent": "#2563eb", "btn_gradient": "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-        "tab_active": "#2563eb", "signature_text": "#1e3a8a", "signature": "Build 2.3.1 | Native DOM Extraction System"
+        "tab_active": "#2563eb", "signature_text": "#1e3a8a", "signature": "Build 2.6.2 | Direct Engine Synchronization"
     },
     "🪵 Amber Minimalist (Warm Mode)": {
-        "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
+        "global_bg": "#f5f2eb", "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
         "input_bg": "#f4f1ea", "input_text": "#433422", "border": "#d97706",
         "placeholder": "#a16207", "accent": "#d97706", "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
-        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.3.1 | Native DOM Extraction System"
+        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.6.2 | Direct Engine Synchronization"
     }
 }
 active_skin = theme_matrix[st.session_state.ui_theme_mode]
 
-# CONTAINER-BASED INJECTION SHEET (RESTORED EXACT STYLE ARCHITECTURE)
+# CONTAINER-BASED INJECTION SHEET (WITH LAPTOP BACKGROUND RENDERING CORRECTION)
 st.html(f"""
 <style>
+    /* CRITICAL LAPTOP THEME FIX: Target the root application viewer container */
+    .stAppViewContainer, [data-testid="stAppViewContainer"] {{
+        background-color: {active_skin['global_bg']} !important;
+    }}
+
     .mobile-theme-card {{
         background-color: {active_skin['panel_bg']} !important;
         border: 2px solid {active_skin['border']} !important;
@@ -109,7 +113,7 @@ st.html(f"""
         color: {active_skin['text']} !important;
     }}
     
-    /* FIX: Targeted input styling override for custom input background */
+    /* Input field overrides */
     .stTextArea textarea, .stSelectbox div[role="button"], div[data-baseweb="select"] {{
         background-color: {active_skin['input_bg']} !important;
         color: {active_skin['input_text']} !important;
@@ -164,7 +168,7 @@ st.html(f"""
 """)
 
 # ---------------- HEADER ---------------- #
-st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
+st.markdown(f'<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900; color:{active_skin["text"]};">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
 st.markdown(f'<div style="text-align:center;"><p style="font-size:14px; font-weight: 800; color: {active_skin["signature_text"]} !important;">{active_skin["signature"]}</p></div>', unsafe_allow_html=True)
 st.markdown("---")
 
@@ -186,7 +190,7 @@ def parallel_translate_sentence(sentence, target_lang_code):
     except Exception:
         return sentence
 
-# ---------------- CONTAINER WORKSPACE SYSTEM (EXACT ORIGINAL RESTORED) ---------------- #
+# ---------------- CONTAINER WORKSPACE SYSTEM ---------------- #
 st.markdown(f'<div class="mobile-theme-card">', unsafe_allow_html=True)
 
 st.markdown("## 📥 Source Workspace")
@@ -214,12 +218,10 @@ if execute_flag:
             sentence_tokens = re.split(r'(?<=[.!?])\s+|\n', cleaned_input_chunk)
             sentence_tokens = [s.strip() for s in sentence_tokens if s.strip()]
             
-            # 1. Translate Source -> Target Language
             with ThreadPoolExecutor(max_workers=min(10, len(sentence_tokens))) as executor:
                 translated_results = list(executor.map(lambda s: parallel_translate_sentence(s, target_code), sentence_tokens))
             translated = " ".join(translated_results)
             
-            # 2. Translate Target Language -> User's Selected Native Tongue
             native_code = language_dict.get(user_native_lang, 'en')
             if target_code == native_code:
                 meaning = translated
@@ -241,7 +243,7 @@ if execute_flag:
     else:
         st.warning("Please enter text before running execution pipelines.")
 
-# ---------------- TABBED DATA PROCESSING TIERS (EXACT ORIGINAL RESTORED) ---------------- #
+# ---------------- TABBED DATA PROCESSING TIERS ---------------- #
 if st.session_state.translated_text:
     st.markdown(f'<div class="mobile-theme-card">', unsafe_allow_html=True)
     st.markdown("### 📊 Engine Data Manifest Output")
@@ -278,7 +280,7 @@ if st.session_state.translation_history:
     st.write("### 📜 Session History Logs")
     for log_node in st.session_state.translation_history[:3]:
         st.markdown(
-            f"<div style='background-color:{active_skin['panel_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['text']};'>"
+            f"<div style='background-color:{active_skin['panel_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['text']}; border: 1px solid {active_skin['border']};'>"
             f"<b>{log_node['lang'].upper()}:</b> {log_node['target']} <br>"
             f"<small style='color:{active_skin['subtext']};'>Source: {log_node['source']}</small></div>", 
             unsafe_allow_html=True
