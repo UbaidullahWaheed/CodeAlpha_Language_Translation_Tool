@@ -69,65 +69,62 @@ with st.sidebar:
     )
     st.caption(f"Routing processing through **{ai_engine}** pipelines.")
 
-# ---------------- THEME CONFIGURATION MATRIX WITH MAIN GLOBAL BACKGROUNDS ---------------- #
+# ---------------- SAFE COLOR MATRIX (ONLY CHANGES INPUT BOXES) ---------------- #
 theme_matrix = {
     "🌌 Deep Space (Dark Mode)": {
-        "global_bg": "#0d1117", "panel_bg": "#161b22", "text": "#ffffff", "subtext": "#8b949e",
+        "panel_bg": "#161b22", "text": "#ffffff", "subtext": "#8b949e",
         "input_bg": "#161b22", "input_text": "#58a6ff", "border": "#30363d",
         "placeholder": "#6e7681", "accent": "#58a6ff", "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
-        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.6.2 | Direct Engine Synchronization"
+        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.6.5 | Visibility Fix Core"
     },
     "☀️ Solar Flare (Light Mode)": {
-        "global_bg": "#f8fafc", "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#475569",
-        "input_bg": "#f1f5f9", "input_text": "#0f172a", "border": "#3b82f6",
-        "placeholder": "#2563eb", "accent": "#2563eb", "btn_gradient": "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-        "tab_active": "#2563eb", "signature_text": "#1e3a8a", "signature": "Build 2.6.2 | Direct Engine Synchronization"
+        "panel_bg": "#1e293b", "text": "#ffffff", "subtext": "#94a3b8",
+        "input_bg": "#f8fafc", "input_text": "#0f172a", "border": "#3b82f6",
+        "placeholder": "#64748b", "accent": "#3b82f6", "btn_gradient": "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+        "tab_active": "#2563eb", "signature_text": "#38bdf8", "signature": "Build 2.6.5 | Visibility Fix Core"
     },
     "🪵 Amber Minimalist (Warm Mode)": {
-        "global_bg": "#f5f2eb", "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
-        "input_bg": "#f4f1ea", "input_text": "#433422", "border": "#d97706",
-        "placeholder": "#a16207", "accent": "#d97706", "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
-        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.6.2 | Direct Engine Synchronization"
+        "panel_bg": "#2d2419", "text": "#ffffff", "subtext": "#a18262",
+        "input_bg": "#fffcf0", "input_text": "#433422", "border": "#d97706",
+        "placeholder": "#b48956", "accent": "#d97706", "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
+        "tab_active": "#ea580c", "signature_text": "#fbbf24", "signature": "Build 2.6.5 | Visibility Fix Core"
     }
 }
 active_skin = theme_matrix[st.session_state.ui_theme_mode]
 
-# CONTAINER-BASED INJECTION SHEET (WITH LAPTOP BACKGROUND RENDERING CORRECTION)
+# CONTAINER-BASED INJECTION SHEET
 st.html(f"""
 <style>
-    /* CRITICAL LAPTOP THEME FIX: Target the root application viewer container */
-    .stAppViewContainer, [data-testid="stAppViewContainer"] {{
-        background-color: {active_skin['global_bg']} !important;
-    }}
-
+    /* Keep the wrapper card dark or deep warm so white text is always 100% visible */
     .mobile-theme-card {{
         background-color: {active_skin['panel_bg']} !important;
         border: 2px solid {active_skin['border']} !important;
         border-radius: 14px;
         padding: 24px;
         margin-bottom: 20px;
-        color: {active_skin['text']} !important;
+        color: #ffffff !important;
     }}
     
-    .mobile-theme-card h4, .mobile-theme-card p, .mobile-theme-card label {{
-        color: {active_skin['text']} !important;
+    .mobile-theme-card h2, .mobile-theme-card h3, .mobile-theme-card p, .mobile-theme-card label {{
+        color: #ffffff !important;
     }}
     
-    /* Input field overrides */
+    /* Target the text boxes directly to change their inner color based on choice */
     .stTextArea textarea, .stSelectbox div[role="button"], div[data-baseweb="select"] {{
         background-color: {active_skin['input_bg']} !important;
         color: {active_skin['input_text']} !important;
-        border: 1px solid {active_skin['border']} !important;
+        border: 2px solid {active_skin['border']} !important;
     }}
     
     .stTextArea textarea {{
-        color: {active_skin['text']} !important;
+        color: {active_skin['input_text']} !important;
+        font-size: 16px !important;
     }}
 
-    /* Placeholder Visibility Override */
+    /* Placeholder Visibility Fix */
     .stTextArea textarea::placeholder {{
         color: {active_skin['placeholder']} !important;
-        opacity: 1 !important;
+        opacity: 0.8 !important;
         -webkit-text-fill-color: {active_skin['placeholder']} !important;
     }}
 
@@ -148,7 +145,7 @@ st.html(f"""
         padding: 4px;
     }}
     .stTabs [data-baseweb="tab"] {{
-        color: {active_skin['text']} !important;
+        color: #ffffff !important;
     }}
     .stTabs [aria-selected="true"] {{
         background-color: {active_skin['tab_active']} !important;
@@ -158,17 +155,18 @@ st.html(f"""
     
     .output-content-block {{
         background-color: {active_skin['input_bg']};
-        color: {active_skin['text']};
-        border: 1px solid {active_skin['border']};
+        color: {active_skin['input_text']};
+        border: 2px solid {active_skin['border']};
         padding: 15px;
         border-radius: 8px;
         min-height: 100px;
+        font-size: 16px;
     }}
 </style>
 """)
 
 # ---------------- HEADER ---------------- #
-st.markdown(f'<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900; color:{active_skin["text"]};">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
+st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900; color:#ffffff;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
 st.markdown(f'<div style="text-align:center;"><p style="font-size:14px; font-weight: 800; color: {active_skin["signature_text"]} !important;">{active_skin["signature"]}</p></div>', unsafe_allow_html=True)
 st.markdown("---")
 
@@ -194,7 +192,7 @@ def parallel_translate_sentence(sentence, target_lang_code):
 st.markdown(f'<div class="mobile-theme-card">', unsafe_allow_html=True)
 
 st.markdown("## 📥 Source Workspace")
-st.markdown("<p style='font-size: 14px; margin-bottom: 2px;'>enter the text to be translated</p>", unsafe_allow_html=True)
+st.markdown("<p style='font-size: 14px; margin-bottom: 2px; color:#ffffff;'>enter the text to be translated</p>", unsafe_allow_html=True)
 
 entry_method = st.radio("Input Strategy Processing Mode:", ["Universal Auto-Detect", "Phonetic Conversion"], horizontal=True, label_visibility="collapsed")
 source_text = st.text_area("Source Processing Input Window", value=st.session_state.input_text_buffer, height=180, placeholder="Enter target text or multi-line paragraphs here...", label_visibility="collapsed")
@@ -280,7 +278,7 @@ if st.session_state.translation_history:
     st.write("### 📜 Session History Logs")
     for log_node in st.session_state.translation_history[:3]:
         st.markdown(
-            f"<div style='background-color:{active_skin['panel_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:{active_skin['text']}; border: 1px solid {active_skin['border']};'>"
+            f"<div style='background-color:{active_skin['panel_bg']}; border-left:5px solid {active_skin['accent']}; padding:12px; margin-bottom:6px; border-radius:6px; color:#ffffff; border: 1px solid {active_skin['border']};'>"
             f"<b>{log_node['lang'].upper()}:</b> {log_node['target']} <br>"
             f"<small style='color:{active_skin['subtext']};'>Source: {log_node['source']}</small></div>", 
             unsafe_allow_html=True
