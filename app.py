@@ -122,12 +122,18 @@ theme_matrix = {
 # ═══════════════════════════════════════════════════════════
 # SIDEBAR
 # ═══════════════════════════════════════════════════════════
+# Safely resolve current theme (guards against stale session state keys)
+_default_theme = list(theme_matrix.keys())[0]
+if st.session_state.ui_theme_mode not in theme_matrix:
+    st.session_state.ui_theme_mode = _default_theme
+_ST = theme_matrix[st.session_state.ui_theme_mode]
+
 with st.sidebar:
     st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, {theme_matrix[st.session_state.ui_theme_mode]['btn_bg']}, {theme_matrix[st.session_state.ui_theme_mode]['accent2']});
+        background: linear-gradient(135deg, {_ST['btn_bg']}, {_ST['accent2']});
         border-radius: 12px; padding: 14px 18px; margin-bottom: 4px;
-        box-shadow: 0 4px 16px {theme_matrix[st.session_state.ui_theme_mode]['accent']}44;
+        box-shadow: 0 4px 16px {_ST['accent']}44;
     ">
         <div style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700;
                     color:#ffffff; letter-spacing:0.3px; display:flex; align-items:center; gap:8px;">
