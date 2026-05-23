@@ -76,21 +76,21 @@ theme_matrix = {
         "input_bg": "#0d1117", "input_text": "#58a6ff", "border": "#30363d",
         "placeholder": "#6e7681", "accent": "#58a6ff", 
         "btn_gradient": "linear-gradient(135deg, #4f46e5 0%, #db2777 100%)",
-        "tab_active": "#4f46e5", "signature": "Build 2.5.1 | Custom Dark Engine"
+        "tab_active": "#4f46e5", "signature_text": "#8b949e", "signature": "Build 2.5.2 | Custom Dark Engine"
     },
     "☀️ Solar Flare (Vibrant Light)": {
-        "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#3b82f6",
+        "panel_bg": "#ffffff", "text": "#0f172a", "subtext": "#1e40af",
         "input_bg": "#f0f4f8", "input_text": "#1e3a8a", "border": "#3b82f6",
         "placeholder": "#2563eb", "accent": "#4f46e5", 
         "btn_gradient": "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-        "tab_active": "#6366f1", "signature": "Build 2.5.1 | Vibrant Light Matrix"
+        "tab_active": "#6366f1", "signature_text": "#1e3a8a", "signature": "Build 2.5.2 | Vibrant Light Matrix"
     },
     "🪵 Amber Minimalist (Warm Mode)": {
         "panel_bg": "#fffcf0", "text": "#433422", "subtext": "#715c43",
         "input_bg": "#f4f1ea", "input_text": "#433422", "border": "#d97706",
         "placeholder": "#a16207", "accent": "#d97706", 
         "btn_gradient": "linear-gradient(135deg, #ea580c 0%, #d97706 100%)",
-        "tab_active": "#ea580c", "signature": "Build 2.5.1 | Custom Warm Engine"
+        "tab_active": "#ea580c", "signature_text": "#715c43", "signature": "Build 2.5.2 | Custom Warm Engine"
     }
 }
 active_skin = theme_matrix[st.session_state.ui_theme_mode]
@@ -109,7 +109,7 @@ st.html(f"""
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }}
     
-    .mobile-theme-card h4, .mobile-theme-card p, .mobile-theme-card label {{
+    .mobile-theme-card h4, .mobile-theme-card p, .mobile-theme-card label, .mobile-theme-card span {{
         color: {active_skin['text']} !important;
     }}
     
@@ -184,7 +184,8 @@ st.html(f"""
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div style="text-align:center;"><h1 style="font-size:36px; font-weight:900; background: linear-gradient(to right, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🪐 NexusAI Universal Translation Matrix</h1></div>', unsafe_allow_html=True)
-st.markdown(f"<p style='text-align:center; font-size:13px; font-weight: 600; color: {active_skin['text']};'>{active_skin['signature']}</p>", unsafe_allow_html=True)
+# FIXED TEXT COLOR DYNAMIC GENERATOR FOR BUILD SIGNATURE LINE
+st.markdown(f'<div style="text-align:center;"><p style="font-size:14px; font-weight: 800; color: {active_skin["signature_text"]} !important;">{active_skin["signature"]}</p></div>', unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- HELPER CONCURRENT TRANSLATION WORKER ---------------- #
