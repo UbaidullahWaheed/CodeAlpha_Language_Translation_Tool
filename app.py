@@ -44,9 +44,11 @@ language_catalog = sorted(list(language_dict.keys()))
 with st.sidebar:
     st.markdown("## ⚙️ Core Configuration Panel")
     
+    # Adding a key to the theme selector forces Streamlit to handle mobile state reruns instantly
     app_theme = st.selectbox(
         "Application Custom UI Skin",
-        ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"]
+        ["🌌 Deep Space (Dark)", "☀️ Solar Flare (Light)", "🪵 Amber Minimalist (Warm Theme)"],
+        key="mobile_theme_selector"
     )
     
     user_native_lang = st.selectbox(
@@ -69,27 +71,41 @@ theme_styles = {
         "bg": "#0b0e14", "card": "#161b22", "text": "#ffffff", 
         "input_bg": "#10141a", "input_text": "#58a6ff", "border": "#30363d",
         "accent": "#4f46e5", "sidebar_bg": "#0d1117", "sidebar_text": "#f0f6fc",
-        "popover_bg": "#161b22", "download_btn": "linear-gradient(135deg, #238636 0%, #2ea043 100%)"
+        "popover_bg": "#161b22", "download_btn": "linear-gradient(135deg, #238636 0%, #2ea043 100%)",
+        "header_icon": "#ffffff"  # High-contrast color for header icons
     },
     "☀️ Solar Flare (Light)": {
         "bg": "#f8fafc", "card": "#ffffff", "text": "#0f172a",          
         "input_bg": "#ffffff", "input_text": "#0f172a", "border": "#2563eb",        
         "accent": "#2563eb", "sidebar_bg": "#f1f5f9", "sidebar_text": "#0f172a",
-        "popover_bg": "#ffffff", "download_btn": "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
+        "popover_bg": "#ffffff", "download_btn": "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+        "header_icon": "#0f172a"  # Dark contrast for light themes so deploy & dots are clear
     },
     "🪵 Amber Minimalist (Warm Theme)": {
         "bg": "#f4f1ea", "card": "#fffcf0", "text": "#433422", 
         "input_bg": "#ffffff", "input_text": "#433422", "border": "#c2410c",        
         "accent": "#c2410c", "sidebar_bg": "#efebe3", "sidebar_text": "#433422",
-        "popover_bg": "#fffcf0", "download_btn": "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)"
+        "popover_bg": "#fffcf0", "download_btn": "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)",
+        "header_icon": "#433422"  # Amber contrast for warm theme elements
     }
 }
 sel_theme = theme_styles[app_theme]
 
 st.markdown(f"""
 <style>
+    /* FIX: FORCED RERENDER INJECTOR FOR MOBILE SYSTEM VIEWPORTS */
     .stApp {{ background-color: {sel_theme['bg']} !important; }}
     h1, h2, h3, h4, h5, h6, p, label, span, small {{ color: {sel_theme['text']} !important; }}
+
+    /* FIX: TOP EXTRUDED BANNER ACCESSIBILITY (DEPLOY, RUNNING ICON, & THREE DOTS MENU) */
+    header[data-testid="stHeader"] {{
+        background-color: {sel_theme['bg']} !important;
+        background: transparent !important;
+    }}
+    header[data-testid="stHeader"] svg, header[data-testid="stHeader"] button, header[data-testid="stHeader"] div {{
+        fill: {sel_theme['header_icon']} !important;
+        color: {sel_theme['header_icon']} !important;
+    }}
 
     [data-testid="stSidebar"] {{
         background-color: {sel_theme['sidebar_bg']} !important;
@@ -161,7 +177,6 @@ st.markdown(f"""
     .main-title {{ font-size: 38px; font-weight: 900; text-align: center; background: linear-gradient(to right, {sel_theme['accent']}, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0px; }}
     .history-item {{ background-color: {sel_theme['card']}; border-left: 5px solid {sel_theme['accent']}; padding: 12px; margin-bottom: 6px; border-radius: 6px; }}
     
-    /* Dynamic Notification Bar for Mobile Devices */
     .mobile-instruction-banner {{
         background: linear-gradient(to right, {sel_theme['accent']}, #db2777);
         color: white !important;
@@ -179,11 +194,10 @@ st.markdown(f"""
 
 # ---------------- HEADER ---------------- #
 st.markdown('<div class="main-title">🪐 NexusAI Global Translation Matrix</div>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.2.7 | Android User UX Notification Layer</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-size:13px; opacity:0.8; margin-bottom: 25px;'>Build 2.2.8 | Mobile Viewport CSS Alignment Patch</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- MOBILE / ANDROID UX NOTICE HEADLINE ---------------- #
-# This headline acts as a clear banner reminder since sidebars slide away on small Android screens
 st.markdown(
     f'<div class="mobile-instruction-banner">📱 <b>Android/Mobile Users:</b> Open the left sidebar menu (top-left arrow <b>&gt;</b>) to change your <span>Native Tongue Settings</span> for perfect meaning context verification.</div>', 
     unsafe_allow_html=True
